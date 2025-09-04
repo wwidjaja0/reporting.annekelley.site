@@ -8,45 +8,17 @@ Returns JSON encoding of response
  !--- Need to get the JSON encoding into the right format for ZingChart ---!
 */
 
-const process = require('process');
-
-export async function getData(resource, colNames) {
-  let url = "https://annekelley.site/api.php";
-
-  if (resource == "static") {
-    url += "/static";
-  }
-  else if (resource == "performance") {
-    url += "/performance";
-  }
-  else if (resource == "activity") {
-    url += "/activity";
-  }
-  else {
-    // send an error message
-  }
-
-  // path will be /api.php/{resource}/{col_1}&{col_2}&...&{col_n}
-  if (colNames.length != 0) {
-    url += "/";
-    let lastIndex = colNames.length - 1;
-    for (let i = 0; i < lastIndex; i++) {
-      url += colNames[i] + "&"; // & purely for purposes of debugging, php api would work fine without it
-      // since we are using strpos and no colName is a subset of another colName
-    }
-    url += colNames[lastIndex];
-  }
+async function getData(resource, colNames) {
+  const cols = colNames.join("&");
+  const url = `/proxy.php?resource=${encodeURIComponent(resource)}&cols=${encodeURIComponent(cols)}`;
 
   try {
-    const response = await fetch(url, { headers: { 'Authorization': 'Basic ' + btoa(process.env.USERNAME + ":" + process.env.PASSWORD) } });
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const result = await response.json();
-    console.log(result);
+    console.log("Proxy response:", result);
     return result;
-  } catch (error) {
-    console.error(error.message);
+  } catch (err) {
+    console.error("Proxy fetch failed:", err);
   }
 }
