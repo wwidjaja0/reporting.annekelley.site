@@ -8,7 +8,7 @@ Returns JSON encoding of response
  !--- Need to get the JSON encoding into the right format for ZingChart ---!
 */
 
-import { env } from 'process';
+const process = require('process');
 
 export async function getData(resource, colNames) {
   let url = "https://annekelley.site/api.php";
@@ -38,7 +38,7 @@ export async function getData(resource, colNames) {
   }
 
   try {
-    const response = await fetch(url, { headers: { 'Authorization': 'Basic ' + btoa(env.USERNAME + ":" + env.PASSWORD) } });
+    const response = await fetch(url, { headers: { 'Authorization': 'Basic ' + btoa(process.env.USERNAME + ":" + process.env.PASSWORD) } });
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
