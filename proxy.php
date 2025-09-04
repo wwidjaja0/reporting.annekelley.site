@@ -21,7 +21,7 @@ $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 // Add Basic Auth credentials (safe here, hidden from browser)
-curl_setopt($ch, CURLOPT_USERPWD, "yourUser:yourPass");
+curl_setopt($ch, CURLOPT_USERPWD, "Anne:f0ll0werofLuthien1902!");
 
 // Forward headers (optional)
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
