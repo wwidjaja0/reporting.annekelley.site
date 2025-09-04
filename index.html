@@ -9,10 +9,30 @@
 
 <body>
     <!-- ZingChart -->
+    <style>
+        #charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        #charts>div {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 10px;
+        }
+    </style>
+
     <div id="charts">
-        <div id="bar3"></div><br><br>
-        <div id="bar2"></div><br><br>
+        <div id="bar3"></div>
+        <div id="bar2"></div>
         <div id="pie"></div>
+        <div id="cookies"></div>
+        <div id="javascript"></div>
+        <div id="network"></div>
+        <div id="languages"></div>
     </div>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
@@ -330,6 +350,94 @@
         }
 
         renderCharts();
+
+        // Aggregate counts
+        const cookieCounts = {};
+        rawStaticData.forEach(item => {
+            cookieCounts[item.acceptsCookies === "1" ? "Accepts" : "Rejects"] =
+                (cookieCounts[item.acceptsCookies === "1" ? "Accepts" : "Rejects"] || 0) + 1;
+        });
+
+        // Convert
+        const cookieLabels = Object.keys(cookieCounts);
+        const cookieValues = Object.values(cookieCounts);
+
+        // Config
+        const cookieChart = {
+            type: "pie",
+            title: { text: "Cookie Acceptance" },
+            plot: {
+                slice: '60%',
+                detach: false,
+                valueBox: { placement: 'in', text: '%t\n%npv%' }
+            },
+            series: cookieLabels.map((label, i) => ({
+                text: label,
+                values: [cookieValues[i]]
+            }))
+        };
+
+        // Render
+        zingchart.render({ id: "cookies", data: cookieChart, height: 300, width: '100%' });
+
+        const netCounts = {};
+        rawStaticData.forEach(item => {
+            netCounts[item.userNetConnType || "Unknown"] =
+                (netCounts[item.userNetConnType || "Unknown"] || 0) + 1;
+        });
+
+        const netLabels = Object.keys(netCounts);
+        const netValues = Object.values(netCounts);
+
+        const netChart = {
+            type: "bar",
+            title: { text: "Network Connection Types" },
+            scaleX: { values: netLabels },
+            series: [{ values: netValues, backgroundColor: "#33ccff" }]
+        };
+
+        zingchart.render({ id: "network", data: netChart, height: 350, width: '100%' });
+
+        const jsCounts = {};
+        rawStaticData.forEach(item => {
+            jsCounts[item.allowsJavaScript === "1" ? "Enabled" : "Disabled"] =
+                (jsCounts[item.allowsJavaScript === "1" ? "Enabled" : "Disabled"] || 0) + 1;
+        });
+
+        const jsLabels = Object.keys(jsCounts);
+        const jsValues = Object.values(jsCounts);
+
+        const jsChart = {
+            type: "pie",
+            title: { text: "JavaScript Support" },
+            plot: { slice: '55%' },
+            series: jsLabels.map((label, i) => ({
+                text: label,
+                values: [jsValues[i]]
+            }))
+        };
+
+        zingchart.render({ id: "javascript", data: jsChart, height: 300, width: '100%' });
+
+        const langCounts = {};
+        rawStaticData.forEach(item => {
+            langCounts[item.userLang || "Unknown"] =
+                (langCounts[item.userLang || "Unknown"] || 0) + 1;
+        });
+
+        const langLabels = Object.keys(langCounts);
+        const langValues = Object.values(langCounts);
+
+        const langChart = {
+            type: "bar",
+            title: { text: "User Languages" },
+            scaleX: { values: langLabels },
+            series: [{ values: langValues, backgroundColor: "#ff9933" }]
+        };
+
+        zingchart.render({ id: "languages", data: langChart, height: 350, width: '100%' });
+
+
     </script>
 </body>
 
