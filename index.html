@@ -341,7 +341,7 @@
                     pageOff: { backgroundColor: '#7E7E7E', size: 10, alpha: 0.75 },
                     pageStatus: { color: 'black' }
                 },
-                plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15, 'bar-width': '66%' },
+                plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15 },
                 series: legend_labels.map((label, i) => ({
                     text: label,
                     values: values[i],
@@ -442,8 +442,7 @@
                         fontFamily: "Open Sans",
                         padding: "5 10",
                         text: "%npv%<br>Count: %v"
-                    },
-                    slice: 1
+                    }
                 },
                 series: labels.map((label, i) => ({
                     text: label,
