@@ -195,8 +195,20 @@
                 const langChart = {
                     type: "bar",
                     title: { text: "User Languages" },
-                    scaleX: { values: langLabels },
-                    series: [{ values: langValues, backgroundColor: "#ff9933" }]
+                    scaleX: {
+                        values: langLabels,
+                        item: {
+                            angle: -45,    // rotate labels if needed
+                            'font-size': 10
+                        },
+                        guide: { visible: false },
+                        tick: { visible: true },
+                        step: 1,          // show every label
+                        'max-items': langLabels.length, // prevent auto-skipping
+                    },
+                    series: [
+                        { values: langValues, backgroundColor: "#ff9933" }
+                    ]
                 };
 
                 zingchart.render({ id: "languages", data: langChart, height: 350, width: '100%' });
