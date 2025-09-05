@@ -113,8 +113,8 @@
         let allowsJavaScriptConfig = generateNavPieConfig(await countKeyValue('allowsJavaScript'));
         let allowsImagesConfig = generateNavPieConfig(await countKeyValue('allowsImages'));
         let allowsCSSConfig = generateNavPieConfig(await countKeyValue('allowsCSS'));
-        let userScreenDimensionsConfig = generateBarConfig(await countKeyValue('userScreenDimensions'));
-        let userWindowDimensionsConfig = generateBarConfig(await countKeyValue('userWindowDimensions'));
+        let userScreenDimensionsConfig = generateBarConfig();
+        let userWindowDimensionsConfig = generateBarConfig();
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
         let pageLoadStartConfig = generateHorizontalBoxPlot();
