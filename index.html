@@ -103,181 +103,218 @@
     </section>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
-        import { getData } from '/fetch.js';
+        import { getData, userAgentsToWordCloud } from '/fetch.js';
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
-        let userAgentConfig = {
-            type: 'wordcloud',
-            options: {
-                text: 'TO REPLACE WITH API DATA.', // aggregated text
-                aspect: 'flow-center',
-                maxItems: 40,
-                style: {
-                    hoverState: {
-                        backgroundColor: 'orange',
-                        borderRadius: 2,
-                        fontColor: 'black'
-                    },
+        let userAgentConfig = generateWordCloudConfig(userAgentsToWordCloud());
+        let userLangConfig = generateBarConfig({Accepts: 70, Rejects: 30});
+        let acceptsCookiesConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
+        let allowsJavaScriptConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
+        let allowsImagesConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
+        let allowsCSSConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
+        let userScreenDimensionsConfig = generateBarConfig({Accepts: 70, Rejects: 30});
+        let userWindowDimensionsConfig = generateBarConfig({Accepts: 70, Rejects: 30});
+        let userNetConnTypeConfig = generateBarConfig({Accepts: 70, Rejects: 30});
 
-                    tooltip: {
-                        text: '%text: %hits',
-                        visible: true,
-                        alpha: 0.8,
-                        backgroundColor: 'black',
-                        borderRadius: 8,
-                        borderColor: 'none',
-                        fontColor: 'yellow',
-                        fontSize: 14,
+        let pageLoadStartConfig = generateHorizontalBoxPlot();
+        let pageLoadEndConfig = generateHorizontalBoxPlot();
+        let pageLoadTimeTotalConfig = generateHorizontalBoxPlot();
+
+        let mouseHeatmapConfig = generateHeatMap('mouseHeatmap');
+        let errorsConfig = generateWordCloudConfig();
+
+        /**
+         * Generates configuration for a word cloud chart.
+         * @param {string} textData - The aggregated text data for the word cloud.
+         * @param {Object} otherOptions - Additional options for the word cloud.
+         * @returns {Object} - Configuration object for the word cloud.
+         */
+        function generateWordCloudConfig(textData = "", otherOptions) {
+            return {
+                type: 'wordcloud',
+                options: {
+                    text: textData,
+                    aspect: 'flow-center',
+                    maxItems: 40,
+                    style: {
+                        hoverState: {
+                            backgroundColor: 'orange',
+                            borderRadius: 2,
+                            fontColor: 'black'
+                        },
+
+                        tooltip: {
+                            text: '%text: %hits',
+                            visible: true,
+                            alpha: 0.8,
+                            backgroundColor: 'black',
+                            borderRadius: 8,
+                            borderColor: 'none',
+                            fontColor: 'yellow',
+                            fontSize: 14,
+                        }
                     }
-                }
+                },
+                otherOptions
             }
-        };
+        }
 
-        let userLangConfig = {
-            type: "bar",
-            scaleX: {
-                values: ['en-US', 'en-GB', 'fr-FR', 'es-ES', 'de-DE'], // x-axis labels
-                item: {
-                    angle: -45,
+        /**
+         * Generates configuration for a bar chart.
+         * @param {JSON} keyValuePairs - Labels paired with values for the bar chart.
+         * @param {Object} otherOptions - Additional options for the bar chart.
+         * @returns {Object} - Configuration object for the bar chart.
+         */
+        function generateBarConfig(keyValuePairs = {}, otherOptions) {
+            return {
+                type: "bar",
+                scaleX: {
+                    values: Object.keys(keyValuePairs), // x-axis labels
+                    item: {
+                        angle: -45,
+                    },
+                    step: 1,
+                    'items-overlap': true
                 },
-                step: 1,
-                'items-overlap': true
-            },
-            series: [
-                { values: [100, 10, 10, 10, 10, 0] } // y-axis values
-            ]
-        };
+                series: [
+                    { values: Object.values(keyValuePairs) } // y-axis values
+                ]
+            };
+        }
 
-        let acceptsCookiesConfig = {
-            type: "pie",
-            plot: {
-                detach: true,
-                valueBox: {
-                    text: '%t\n%npv%'
+        /**
+         * Generates configuration for a pie chart.
+         * @param {Array} keyValuePairs - Labels paired with values for the pie chart.
+         * @param {Object} otherOptions - Additional options for the pie chart.
+         * @returns {Object} - Configuration object for the pie chart.
+         */
+        function generateNavPieConfig(keyValuePairs = {}, otherOptions) {
+            return {
+                type: 'navpie',
+                plot: {
+                    detach: true,
+                    valueBox: {
+                        text: '%t\n%npv%'
+                    },
+                    tooltip: {
+                        text: "%npv%<br>Count: %v"
+                    },
                 },
-                tooltip: {
-                    text: "%npv%<br>Count: %v"
-                },
-            },
-            series: [{
-                text: "Accepts",
-                values: [10]
-            },
-            {
-                text: "Rejects",
-                values: [5]
-            }]
-        };
+                series: Object.entries(keyValuePairs).map(([key, value]) => ({
+                    text: key,
+                    values: [value]
+                })),
+                otherOptions,
+            }
+        }
 
-        let allowsJavaScriptConfig = {
-            type: "pie",
-            plot: {
-                detach: true,
-                valueBox: {
-                    text: '%t\n%npv%'
-                },
-                tooltip: {
-                    text: "%npv%<br>Count: %v"
-                },
-            },
-            series: [{
-                text: "Accepts",
-                values: [10]
-            },
-            {
-                text: "Rejects",
-                values: [5]
-            }]
-        };
+        /**
+         * Generates configuration for a horizontal box plot chart.
+         * @returns {Object} - Configuration object for the horizontal box plot.
+         */
+        function generateHorizontalBoxPlot() {
+            return {
+                "graphset": [{
+                    "type": "hboxplot",
+                    "plotarea": {
+                        "margin": "100"
+                    },
+                    "scaleX": {
+                        "guide": {
+                            "visible": false
+                        },
+                        "label": {
+                            "text": "Experiment No."
+                        },
+                        "values": ["1", "2", "3", "4", "5"],
+                        "item": {
+                            "wrapText": true
+                        }
+                    },
+                    "scaleY": {
+                        "minValue": "auto",
+                        "guide": {
+                            "lineStyle": "solid"
+                        },
+                        "label": {
+                            "text": "Observations"
+                        },
+                        "item": {
+                            "wrapText": true
+                        }
+                    },
+                    "tooltip": {
+                        "fontSize": 11,
+                        "align": "left",
+                        "borderRadius": 7,
+                        "borderWidth": 1,
+                        "backgroundColor": "#fff",
+                        "alpha": 0.9,
+                        "padding": 10,
+                        "color": "#000"
+                    },
+                    "plot": {
 
-        let allowsImagesConfig = {
-            type: "pie",
-            plot: {
-                detach: true,
-                valueBox: {
-                    text: '%t\n%npv%'
-                },
-                tooltip: {
-                    text: "%npv%<br>Count: %v"
-                },
-            },
-            series: [{
-                text: "Accepts",
-                values: [10]
-            },
-            {
-                text: "Rejects",
-                values: [5]
-            }]
-        };
+                    },
+                    "options": {
+                        "box": {
+                            "barWidth": 0.5,
+                            "tooltip": {
+                                "text": "<span style=\"font-style:italic;\">Experiment no. %scale-key-text</span><br><b style=\"font-size:15px;color:%color3\">Observations:</b><br><br>Maximum: <b>%data-max</b><br>Upper Quartile: <b>%data-upper-quartile</b><br>Median: <b>%data-median</b><br>Lower Quartile: <b>%data-lower-quartile</b><br>Minimum: <b>%data-min</b>"
+                            }
+                        },
+                        "outlier": {
+                            "tooltip": {
+                                "text": "<span style=\"font-style:italic;\">Experiment no. %scale-key-text</span><br><b style=\"font-size:15px;color:%color-7\">Observation: %node-value</b>"
+                            },
+                            "marker": {
+                                "type": "circle"
+                            }
+                        }
+                    },
+                    "series": [{
+                        "dataBox": [
+                            [760, 801, 848, 895, 965],
+                            [733, 853, 939, 980, 1080],
+                            [714, 762, 817, 870, 918],
+                            [724, 802, 836, 871, 950],
+                            [834, 856, 864, 882, 910]
+                        ],
+                        "dataOutlier": [
+                            [0, 644],
+                            [1, 718],
+                            [4, 951],
+                            [3, 969],
+                            [2, 944]
+                        ]
+                    }]
+                }]
+            };
+        }
 
-        let allowsCSSConfig = {
-            type: "pie",
-            plot: {
-                detach: true,
-                valueBox: {
-                    text: '%t\n%npv%'
-                },
-                tooltip: {
-                    text: "%npv%<br>Count: %v"
-                },
-            },
-            series: [{
-                text: "Accepts",
-                values: [10]
-            },
-            {
-                text: "Rejects",
-                values: [5]
-            }]
-        };
-
-        let userScreenDimensionsConfig = {
-            type: "bar",
-            scaleX: {
-                values: ['720', '1080', '1440', '2160'], // x-axis labels
-                item: {
-                    angle: -45,
-                },
-                step: 1,
-                'items-overlap': true
-            },
-            series: [
-                { values: [100, 10, 10, 10] } // y-axis values
-            ]
-        };
-
-        let userWindowDimensionsConfig = {
-            type: "bar",
-            scaleX: {
-                values: ['720', '1080', '1440', '2160'], // x-axis labels
-                item: {
-                    angle: -45,
-                },
-                step: 1,
-                'items-overlap': true
-            },
-            series: [
-                { values: [100, 10, 10, 10] } // y-axis values
-            ]
-        };
-
-        let userNetConnTypeConfig = {
-            type: "bar",
-            scaleX: {
-                values: ['2g', '3g', '4g'], // x-axis labels
-                item: {
-                    angle: -45,
-                },
-                step: 1,
-                'items-overlap': true
-            },
-            series: [
-                { values: [100, 10, 10] } // y-axis values
-            ]
-        };
-
+        /**
+         * Generates configuration for a heat map chart.
+         * @param {string} elementID - The ID of the HTML element to bind the heat map to.
+         * @returns {Object} - Configuration object for the heat map.
+         */
+        function generateHeatMap(elementID) {
+            var MAX = 100;
+            var aData = [];
+            zingchart.bind(elementID, 'load', function () {
+                var l, k, v;
+                var iMaxPoints = 512;
+                for (l = 0; l < iMaxPoints; l++) {
+                    k = 5 * Math.round(((iMaxPoints - l) % 300) / 5) + 350;
+                    v = 5 * Math.round((l % 100) / 5) + 250;
+                    aData.push([k, v, MAX]);
+                }
+                zingchart.exec(elementID, 'heatmap.setdata', {
+                    data: aData
+                });
+            });
+        }
+        
         try {
             zingchart.render({ id: 'userAgent', data: userAgentConfig, width: '100%' });
             zingchart.render({ id: 'userLang', data: userLangConfig, width: '100%' });
@@ -289,434 +326,432 @@
             zingchart.render({ id: 'userWindowDimensions', data: userWindowDimensionsConfig, width: '100%' });
             zingchart.render({ id: 'userNetConnType', data: userNetConnTypeConfig, width: '100%' });
 
+            zingchart.render({ id: 'pageLoadStart', data: pageLoadStartConfig, width: '100%' });
+            zingchart.render({ id: 'pageLoadEnd', data: pageLoadEndConfig, width: '100%' });
+            zingchart.render({ id: 'pageLoadTimeTotal', data: pageLoadTimeTotalConfig, width: '100%' });
+
+            var cdata = {
+                type: 'radar',
+                heatmap: {},
+                plotarea: {
+                    margin: 10
+                },
+                scale: {
+                    sizeFactor: 0.9
+                },
+                scaleV: {
+                    offsetStart: 40,
+                    offsetEnd: 0,
+                    values: '0:100:25'
+                },
+                scaleK: {
+                    aspect: 'circle',
+                    values: '0:355:5',
+                    maxItems: 12
+                },
+                tooltip: {},
+                plot: {},
+                series: [{}]
+            };
+
+            zingchart.render({
+                id: 'mouseHeatmap',
+                data: cdata,
+                width: '100%',
+                output: 'svg',
+                modules: 'heatmap,color-scale'
+            });
+            zingchart.render({ id: 'errors', data: errorsConfig, width: '100%' });
         } catch (e) {
-            console.error("Error rendering userAgent word cloud:", e);
+            console.error("Error rendering chart:", e);
         }
 
-        async function renderCharts() {
-            try {
-                // Dynamic fetch of data
-                const rawStaticData = await getData('static',
-                    ['userScreenWidth', 'userScreenHeight', 'userWindowWidth', 'userWindowHeight', 'userLang',
-                        'userNetConnType', 'acceptsCookies', 'allowsJavaScript']);
-                // 3 series bar chart
-                // Comparing 3 groups of user screen width in terms of their screen height
-                parseCounts('bar3', [item.userScreenWidth, item.userScreenHeight], [bar1280Counts3, bar1920Counts3, barOtherCounts3], ['1280', '1920', 'other']);
+        // async function renderCharts() {
+        //     try {
+        //         // Dynamic fetch of data
+        //         const rawStaticData = await getData('static',
+        //             ['userScreenWidth', 'userScreenHeight', 'userWindowWidth', 'userWindowHeight', 'userLang',
+        //                 'userNetConnType', 'acceptsCookies', 'allowsJavaScript']);
+        //         // 3 series bar chart
+        //         // Comparing 3 groups of user screen width in terms of their screen height
+        //         parseCounts('bar3', [item.userScreenWidth, item.userScreenHeight], [bar1280Counts3, bar1920Counts3, barOtherCounts3], ['1280', '1920', 'other']);
 
-                // NOTE: Currently with the way 3 series bar charts are hard coded, other values are grouped together, might have to change this
-                // functionaliy to be more flexible with a different kind of bar3 configuration/style, but with the current
+        //         // NOTE: Currently with the way 3 series bar charts are hard coded, other values are grouped together, might have to change this
+        //         // functionaliy to be more flexible with a different kind of bar3 configuration/style, but with the current
 
-                console.log("Fetched static data:", rawStaticData);
+        //         console.log("Fetched static data:", rawStaticData);
 
-                // Aggregate counts
-                const pieCounts = {};
+        //         // Aggregate counts
+        //         const pieCounts = {};
 
-                const bar1280Counts2 = {}; // window height counts where window width is 1280
-                const bar500Counts2 = {}; // window height counts where window width is 500
+        //         const bar1280Counts2 = {}; // window height counts where window width is 1280
+        //         const bar500Counts2 = {}; // window height counts where window width is 500
 
-                const bar1280Counts3 = {}; // screen height counts where screen width is 1280
-                const bar1920Counts3 = {}; // screen height counts where screen width is 500
-                const barOtherCounts3 = {}; // screen height counts where screen width is not 1280 or 500
+        //         const bar1280Counts3 = {}; // screen height counts where screen width is 1280
+        //         const bar1920Counts3 = {}; // screen height counts where screen width is 500
+        //         const barOtherCounts3 = {}; // screen height counts where screen width is not 1280 or 500
 
-                rawStaticData.forEach(item => {
-                    // Pie chart labels and values
-                    parseCounts('pie', item.userScreenWidth, pieCounts);
+        //         rawStaticData.forEach(item => {
+        //             // Pie chart labels and values
+        //             parseCounts('pie', item.userScreenWidth, pieCounts);
 
-                    // 2 series bar chart
-                    // Comparing screen widths in terms of corresponding screen height counts
-                    parseCounts('bar2', [item.userWindowWidth, item.userWindowHeight], [bar1280Counts2, bar500Counts2], ['1280', '500']);
+        //             // 2 series bar chart
+        //             // Comparing screen widths in terms of corresponding screen height counts
+        //             parseCounts('bar2', [item.userWindowWidth, item.userWindowHeight], [bar1280Counts2, bar500Counts2], ['1280', '500']);
 
-                    // 3 series bar chart
-                    // Comparing 3 groups of user screen width in terms of their screen height
-                    parseCounts('bar3', [item.userScreenWidth, item.userScreenHeight], [bar1280Counts3, bar1920Counts3, barOtherCounts3], ['1280', '1920', 'other']);
+        //             // 3 series bar chart
+        //             // Comparing 3 groups of user screen width in terms of their screen height
+        //             parseCounts('bar3', [item.userScreenWidth, item.userScreenHeight], [bar1280Counts3, bar1920Counts3, barOtherCounts3], ['1280', '1920', 'other']);
 
-                    // NOTE: Currently with the way 3 series bar charts are hard coded, other values are grouped together, might have to change this
-                    // functionaliy to be more flexible with a different kind of bar3 configuration/style, but with the current one it works.
-                });
+        //             // NOTE: Currently with the way 3 series bar charts are hard coded, other values are grouped together, might have to change this
+        //             // functionaliy to be more flexible with a different kind of bar3 configuration/style, but with the current one it works.
+        //         });
 
 
-                // Convert to arrays
-                const pieLabels = Object.keys(pieCounts);
-                const pieValues = Object.values(pieCounts);
+        //         // Convert to arrays
+        //         const pieLabels = Object.keys(pieCounts);
+        //         const pieValues = Object.values(pieCounts);
 
-                const barLabels2 = Object.keys(bar1280Counts2); // either 1280 or 500 would work here
-                // Ensure values are arrays and match the order of barLabels2
-                const bar1280Values2 = barLabels2.map(h => bar1280Counts2[h] || 0);
-                const bar500Values2 = barLabels2.map(h => bar500Counts2[h] || 0);
+        //         const barLabels2 = Object.keys(bar1280Counts2); // either 1280 or 500 would work here
+        //         // Ensure values are arrays and match the order of barLabels2
+        //         const bar1280Values2 = barLabels2.map(h => bar1280Counts2[h] || 0);
+        //         const bar500Values2 = barLabels2.map(h => bar500Counts2[h] || 0);
 
-                const barLabels3 = Object.keys(barOtherCounts3); // any of the three would work here
-                // Ensure values are arrays and match the order of barLabels3
-                const bar1280Values3 = barLabels3.map(h => bar1280Counts3[h] || 0);
-                const bar1920Values3 = barLabels3.map(h => bar1920Counts3[h] || 0);
-                const barOtherValues3 = barLabels3.map(h => barOtherCounts3[h] || 0);
+        //         const barLabels3 = Object.keys(barOtherCounts3); // any of the three would work here
+        //         // Ensure values are arrays and match the order of barLabels3
+        //         const bar1280Values3 = barLabels3.map(h => bar1280Counts3[h] || 0);
+        //         const bar1920Values3 = barLabels3.map(h => bar1920Counts3[h] || 0);
+        //         const barOtherValues3 = barLabels3.map(h => barOtherCounts3[h] || 0);
 
-                // --- 3-Series Bar Chart ---
-                const screenDimensions3 = generateBar3Config([bar1280Values3, bar1920Values3, barOtherValues3],
-                    "Screen Dimensions", barLabels3, "Count", ["Screen Width: 1280", "Screen Width: 1920", "Screen Width: Other"],
-                    ['pink', 'purple', 'blue'], { alpha: [0.7, 0.7, 0.7] }
-                );
+        //         // --- 3-Series Bar Chart ---
+        //         const screenDimensions3 = generateBar3Config([bar1280Values3, bar1920Values3, barOtherValues3],
+        //             "Screen Dimensions", barLabels3, "Count", ["Screen Width: 1280", "Screen Width: 1920", "Screen Width: Other"],
+        //             ['pink', 'purple', 'blue'], { alpha: [0.7, 0.7, 0.7] }
+        //         );
 
-                // -- 2-Series Bar Chart --
-                const windowDimensions2 = generateBar2Config([bar500Values2, bar1280Values2],
-                    "Window Dimensions", barLabels2, "Count", ["Window Width: 500", "Window Width: 1280"],
-                    ["#3366FF", "#00BFFF"], { alpha: [1, 0.7] }
-                );
+        //         // -- 2-Series Bar Chart --
+        //         const windowDimensions2 = generateBar2Config([bar500Values2, bar1280Values2],
+        //             "Window Dimensions", barLabels2, "Count", ["Window Width: 500", "Window Width: 1280"],
+        //             ["#3366FF", "#00BFFF"], { alpha: [1, 0.7] }
+        //         );
 
-                // -- Pie Chart --
-                const pieChart = generatePieConfig(pieLabels, pieValues, "Screen Width Distribution", {
-                    threshold: "15%",
-                    others: { text: "Others", backgroundColor: "#999 #333" },
-                    slice: 0.6
-                });
+        //         // -- Pie Chart --
+        //         const pieChart = generatePieConfig(pieLabels, pieValues, "Screen Width Distribution", {
+        //             threshold: "15%",
+        //             others: { text: "Others", backgroundColor: "#999 #333" },
+        //             slice: 0.6
+        //         });
 
-                // Render
-                zingchart.render({ id: 'bar3', data: JSON.stringify(screenDimensions3), height: 1000, width: '100%' });
-                zingchart.render({ id: 'bar2', data: JSON.stringify(windowDimensions2), height: 1000, width: '100%' });
-                zingchart.render({ id: 'pie', data: JSON.stringify(pieChart), height: 1000, width: '100%' });
+        //         // Render
+        //         zingchart.render({ id: 'bar3', data: JSON.stringify(screenDimensions3), height: 1000, width: '100%' });
+        //         zingchart.render({ id: 'bar2', data: JSON.stringify(windowDimensions2), height: 1000, width: '100%' });
+        //         zingchart.render({ id: 'pie', data: JSON.stringify(pieChart), height: 1000, width: '100%' });
 
-                // Aggregate counts
-                const cookieCounts = {};
-                rawStaticData.forEach(item => {
-                    cookieCounts[item.acceptsCookies === "1" ? "Accepts" : "Rejects"] =
-                        (cookieCounts[item.acceptsCookies === "1" ? "Accepts" : "Rejects"] || 0) + 1;
-                });
+        //         // Aggregate counts
+        //         const cookieCounts = {};
+        //         rawStaticData.forEach(item => {
+        //             cookieCounts[item.acceptsCookies === "1" ? "Accepts" : "Rejects"] =
+        //                 (cookieCounts[item.acceptsCookies === "1" ? "Accepts" : "Rejects"] || 0) + 1;
+        //         });
 
-                // Convert
-                const cookieLabels = Object.keys(cookieCounts);
-                const cookieValues = Object.values(cookieCounts);
+        //         // Convert
+        //         const cookieLabels = Object.keys(cookieCounts);
+        //         const cookieValues = Object.values(cookieCounts);
 
-                // Config
-                const cookieChart = {
-                    type: "pie",
-                    title: { text: "Cookie Acceptance" },
-                    plot: {
-                        slice: '60%',
-                        detach: false,
-                        valueBox: { placement: 'in', text: '%t\n%npv%' }
-                    },
-                    series: cookieLabels.map((label, i) => ({
-                        text: label,
-                        values: [cookieValues[i]]
-                    }))
-                };
+        //         // Config
+        //         const cookieChart = {
+        //             type: "pie",
+        //             title: { text: "Cookie Acceptance" },
+        //             plot: {
+        //                 slice: '60%',
+        //                 detach: false,
+        //                 valueBox: { placement: 'in', text: '%t\n%npv%' }
+        //             },
+        //             series: cookieLabels.map((label, i) => ({
+        //                 text: label,
+        //                 values: [cookieValues[i]]
+        //             }))
+        //         };
 
-                // Render
-                zingchart.render({ id: "cookies", data: cookieChart, height: 1000, width: '100%' });
+        //         // Render
+        //         zingchart.render({ id: "cookies", data: cookieChart, height: 1000, width: '100%' });
 
-                const netCounts = {};
-                rawStaticData.forEach(item => {
-                    netCounts[item.userNetConnType || "Unknown"] =
-                        (netCounts[item.userNetConnType || "Unknown"] || 0) + 1;
-                });
+        //         const netCounts = {};
+        //         rawStaticData.forEach(item => {
+        //             netCounts[item.userNetConnType || "Unknown"] =
+        //                 (netCounts[item.userNetConnType || "Unknown"] || 0) + 1;
+        //         });
 
-                const netLabels = Object.keys(netCounts);
-                const netValues = Object.values(netCounts);
+        //         const netLabels = Object.keys(netCounts);
+        //         const netValues = Object.values(netCounts);
 
-                const netChart = {
-                    type: "bar",
-                    title: { text: "Network Connection Types" },
-                    scaleX: { values: netLabels },
-                    series: [{ values: netValues, backgroundColor: "#33ccff" }]
-                };
+        //         const netChart = {
+        //             type: "bar",
+        //             title: { text: "Network Connection Types" },
+        //             scaleX: { values: netLabels },
+        //             series: [{ values: netValues, backgroundColor: "#33ccff" }]
+        //         };
 
-                zingchart.render({ id: "network", data: netChart, height: 1000, width: '100%' });
+        //         zingchart.render({ id: "network", data: netChart, height: 1000, width: '100%' });
 
-                const jsCounts = {};
-                rawStaticData.forEach(item => {
-                    jsCounts[item.allowsJavaScript === "1" ? "Enabled" : "Disabled"] =
-                        (jsCounts[item.allowsJavaScript === "1" ? "Enabled" : "Disabled"] || 0) + 1;
-                });
+        //         const jsCounts = {};
+        //         rawStaticData.forEach(item => {
+        //             jsCounts[item.allowsJavaScript === "1" ? "Enabled" : "Disabled"] =
+        //                 (jsCounts[item.allowsJavaScript === "1" ? "Enabled" : "Disabled"] || 0) + 1;
+        //         });
 
-                const jsLabels = Object.keys(jsCounts);
-                const jsValues = Object.values(jsCounts);
+        //         const jsLabels = Object.keys(jsCounts);
+        //         const jsValues = Object.values(jsCounts);
 
-                const jsChart = {
-                    type: "pie",
-                    title: { text: "JavaScript Support" },
-                    plot: { slice: '55%' },
-                    series: jsLabels.map((label, i) => ({
-                        text: label,
-                        values: [jsValues[i]]
-                    }))
-                };
+        //         const jsChart = {
+        //             type: "pie",
+        //             title: { text: "JavaScript Support" },
+        //             plot: { slice: '55%' },
+        //             series: jsLabels.map((label, i) => ({
+        //                 text: label,
+        //                 values: [jsValues[i]]
+        //             }))
+        //         };
 
-                zingchart.render({ id: "javascript", data: jsChart, height: 1000, width: '100%' });
+        //         zingchart.render({ id: "javascript", data: jsChart, height: 1000, width: '100%' });
 
-                const langCounts = {};
-                rawStaticData.forEach(item => {
-                    langCounts[item.userLang || "Unknown"] =
-                        (langCounts[item.userLang || "Unknown"] || 0) + 1;
-                });
+        //         const langCounts = {};
+        //         rawStaticData.forEach(item => {
+        //             langCounts[item.userLang || "Unknown"] =
+        //                 (langCounts[item.userLang || "Unknown"] || 0) + 1;
+        //         });
 
-                const langLabels = Object.keys(langCounts);
-                const langValues = Object.values(langCounts);
+        //         const langLabels = Object.keys(langCounts);
+        //         const langValues = Object.values(langCounts);
 
-                const langChart = {
-                    type: "bar",
-                    title: { text: "User Languages" },
-                    scaleX: {
-                        values: langLabels,
-                        item: {
-                            angle: -45,    // rotate labels if needed
-                            'font-size': 10
-                        },
-                        guide: { visible: false },
-                        tick: { visible: true },
-                        step: 1,          // show every label
-                        'max-items': langLabels.length, // prevent auto-skipping
-                        'items-overlap': true // allow overlap if needed
-                    },
-                    series: [
-                        { values: langValues, backgroundColor: "#ff9933" }
-                    ]
-                };
+        //         const langChart = {
+        //             type: "bar",
+        //             title: { text: "User Languages" },
+        //             scaleX: {
+        //                 values: langLabels,
+        //                 item: {
+        //                     angle: -45,    // rotate labels if needed
+        //                     'font-size': 10
+        //                 },
+        //                 guide: { visible: false },
+        //                 tick: { visible: true },
+        //                 step: 1,          // show every label
+        //                 'max-items': langLabels.length, // prevent auto-skipping
+        //                 'items-overlap': true // allow overlap if needed
+        //             },
+        //             series: [
+        //                 { values: langValues, backgroundColor: "#ff9933" }
+        //             ]
+        //         };
 
-                zingchart.render({ id: "languages", data: langChart, height: 1000, width: '100%' });
+        //         zingchart.render({ id: "languages", data: langChart, height: 1000, width: '100%' });
 
-            } catch (err) {
-                console.error("Error rendering charts:", err);
-            }
-        }
+        //     } catch (err) {
+        //         console.error("Error rendering charts:", err);
+        //     }
+        // }
 
-        /**
-         * A function to parse raw data from our API and populate any
-         * given count object.
-         * @param {string} chartType - Type of chart ('pie', 'bar2', 'bar3')
-         * @param {any} rawData - Raw data to be parsed
-         * @param {Object} countObj - Object to store counts
-         */
-        function parseCounts(chartType, rawData, countObj, valueChecks = []) {
-            switch (chartType) {
-                case 'pie':
-                    try {
-                        countObj[rawData] = (countObj[rawData] || 0) + 1;
-                    } catch (err) {
-                        console.error("Error parsing pie chart data:", err);
-                    }
-                    break;
-                case 'bar2':
+        // /**
+        //  * A function to parse raw data from our API and populate any
+        //  * given count object.
+        //  * @param {string} chartType - Type of chart ('pie', 'bar2', 'bar3')
+        //  * @param {any} rawData - Raw data to be parsed
+        //  * @param {Object} countObj - Object to store counts
+        //  */
+        // function parseCounts(chartType, rawData, countObj, valueChecks = []) {
+        //     switch (chartType) {
+        //         case 'pie':
+        //             try {
+        //                 countObj[rawData] = (countObj[rawData] || 0) + 1;
+        //             } catch (err) {
+        //                 console.error("Error parsing pie chart data:", err);
+        //             }
+        //             break;
+        //         case 'bar2':
 
-                    // raw data item will be like this: userWindowWidth = 1280, userWindowHeight = 720
+        //             // raw data item will be like this: userWindowWidth = 1280, userWindowHeight = 720
 
-                    try {
-                        // rawData, countObj, and valueChecks are expected to be an array of two elements
-                        const [x, y] = rawData;
-                        const [countObj1, countObj2] = countObj;
-                        const [valCheck1, valCheck2] = valueChecks;
-                        switch (String(x)) {
-                            case String(valCheck1):
-                                countObj1[y] = (countObj1[y] || 0) + 1;
-                                countObj2[y] = countObj2[y] || 0;
-                                break;
-                            case String(valCheck2):
-                                countObj1[y] = countObj1[y] || 0;
-                                countObj2[y] = (countObj2[y] || 0) + 1;
-                                break;
-                            default:
-                                return; // Ignore other values
-                        }
-                    } catch (err) {
-                        console.error("Error parsing 2-series bar chart data:", err);
-                    }
-                    break;
-                case 'bar3':
-                    try {
-                        // rawData, countObj, and valueChecks are expected to be an array of two elements
-                        const [x, y] = rawData;
-                        const [countObj1, countObj2, countObj3] = countObj;
-                        const [valCheck1, valCheck2, valCheck3] = valueChecks;
-                        switch (x) {
-                            case valCheck1:
-                                countObj1[y] = (countObj1[y] || 0) + 1;
-                                countObj2[y] = countObj2[y] || 0;
-                                countObj3[y] = countObj3[y] || 0;
-                                break;
-                            case valCheck2:
-                                countObj1[y] = countObj1[y] || 0;
-                                countObj2[y] = (countObj2[y] || 0) + 1;
-                                countObj3[y] = countObj3[y] || 0;
-                                break;
-                            default:
-                                countObj1[y] = countObj1[y] || 0;
-                                countObj2[y] = countObj2[y] || 0;
-                                countObj3[y] = (countObj3[y] || 0) + 1;
-                                return;
-                        }
-                    } catch (err) {
-                        console.error("Error parsing 3-series bar chart data:", err);
-                    }
-                    break;
-                default:
-                    console.error("Unknown chart type:", chartType);
-            }
-        }
+        //             try {
+        //                 // rawData, countObj, and valueChecks are expected to be an array of two elements
+        //                 const [x, y] = rawData;
+        //                 const [countObj1, countObj2] = countObj;
+        //                 const [valCheck1, valCheck2] = valueChecks;
+        //                 switch (String(x)) {
+        //                     case String(valCheck1):
+        //                         countObj1[y] = (countObj1[y] || 0) + 1;
+        //                         countObj2[y] = countObj2[y] || 0;
+        //                         break;
+        //                     case String(valCheck2):
+        //                         countObj1[y] = countObj1[y] || 0;
+        //                         countObj2[y] = (countObj2[y] || 0) + 1;
+        //                         break;
+        //                     default:
+        //                         return; // Ignore other values
+        //                 }
+        //             } catch (err) {
+        //                 console.error("Error parsing 2-series bar chart data:", err);
+        //             }
+        //             break;
+        //         case 'bar3':
+        //             try {
+        //                 // rawData, countObj, and valueChecks are expected to be an array of two elements
+        //                 const [x, y] = rawData;
+        //                 const [countObj1, countObj2, countObj3] = countObj;
+        //                 const [valCheck1, valCheck2, valCheck3] = valueChecks;
+        //                 switch (x) {
+        //                     case valCheck1:
+        //                         countObj1[y] = (countObj1[y] || 0) + 1;
+        //                         countObj2[y] = countObj2[y] || 0;
+        //                         countObj3[y] = countObj3[y] || 0;
+        //                         break;
+        //                     case valCheck2:
+        //                         countObj1[y] = countObj1[y] || 0;
+        //                         countObj2[y] = (countObj2[y] || 0) + 1;
+        //                         countObj3[y] = countObj3[y] || 0;
+        //                         break;
+        //                     default:
+        //                         countObj1[y] = countObj1[y] || 0;
+        //                         countObj2[y] = countObj2[y] || 0;
+        //                         countObj3[y] = (countObj3[y] || 0) + 1;
+        //                         return;
+        //                 }
+        //             } catch (err) {
+        //                 console.error("Error parsing 3-series bar chart data:", err);
+        //             }
+        //             break;
+        //         default:
+        //             console.error("Unknown chart type:", chartType);
+        //     }
+        // }
 
-        /**
-         * Generates configuration for a 3-series bar chart.
-         * @param {Array} values - Array of arrays containing values for each series.
-         * @param {string} title - Title of the chart.
-         * @param {Array} x_axis - Labels for the x-axis.
-         * @param {string} y_axis - Label for the y-axis.
-         * @param {Array} legend_labels - Labels for the legend.
-         * @param {Array} colors - Colors for each series.
-         * @param {Object} options - Additional options like alpha values for each series.
-         * @returns {Object} - Configuration object for the 3-series bar chart.
-         */
-        function generateBar3Config(values, title, x_axis, y_axis, legend_labels, colors, options) {
-            return {
-                type: 'bar',
-                title: {
-                    text: title,
-                    backgroundColor: 'none',
-                    fontSize: "22px",
-                    alpha: 0.8,
-                    adjustLayout: true
-                },
-                plotarea: { margin: 'dynamic' },
-                scrollX: {
+        // /**
+        //  * Generates configuration for a 3-series bar chart.
+        //  * @param {Array} values - Array of arrays containing values for each series.
+        //  * @param {string} title - Title of the chart.
+        //  * @param {Array} x_axis - Labels for the x-axis.
+        //  * @param {string} y_axis - Label for the y-axis.
+        //  * @param {Array} legend_labels - Labels for the legend.
+        //  * @param {Array} colors - Colors for each series.
+        //  * @param {Object} options - Additional options like alpha values for each series.
+        //  * @returns {Object} - Configuration object for the 3-series bar chart.
+        //  */
+        // function generateBar3Config(values, title, x_axis, y_axis, legend_labels, colors, options) {
+        //     return {
+        //         type: 'bar',
+        //         title: {
+        //             text: title,
+        //             backgroundColor: 'none',
+        //             fontSize: "22px",
+        //             alpha: 0.8,
+        //             adjustLayout: true
+        //         },
+        //         plotarea: { margin: 'dynamic' },
+        //         scrollX: {
 
-                },
-                scaleX: {
-                    values: x_axis,
-                    zooming: true,
-                    zoomTo: [0, 50],
-                    item: {
-                        fontSize: 10
-                    },
-                    label: { text: "Screen Height", fontFamily: "Helvetica", bold: true, fontSize: "12px", fontColor: "#7E7E7E" }
-                },
-                scaleY: {
-                    lineColor: '#7E7E7E',
-                    item: { fontColor: '#7e7e7e' },
-                    guide: { visible: true },
-                    label: { text: "Count", fontFamily: "Helvetica", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
-                },
-                legend: {
-                    layout: 'x3',
-                    align: 'center',
-                    adjustLayout: true,
-                    shadow: false,
-                    overflow: 'page',
-                    alpha: 0.05,
-                    marker: { type: 'rectangle', borderColor: 'none', size: 12 },
-                    borderWidth: 0,
-                    maxItems: 3,
-                    toggleAction: 'hide',
-                    pageOn: { backgroundColor: '#000', size: 10, alpha: 0.75 },
-                    pageOff: { backgroundColor: '#7E7E7E', size: 10, alpha: 0.75 },
-                    pageStatus: { color: 'black' }
-                },
-                plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15 },
-                series: legend_labels.map((label, i) => ({
-                    text: label,
-                    values: values[i],
-                    backgroundColor: colors[i],
-                    alpha: options?.alpha[i] || 1
-                }))
-            }
-        }
+        //         },
+        //         scaleX: {
+        //             values: x_axis,
+        //             zooming: true,
+        //             zoomTo: [0, 50],
+        //             item: {
+        //                 fontSize: 10
+        //             },
+        //             label: { text: "Screen Height", fontFamily: "Helvetica", bold: true, fontSize: "12px", fontColor: "#7E7E7E" }
+        //         },
+        //         scaleY: {
+        //             lineColor: '#7E7E7E',
+        //             item: { fontColor: '#7e7e7e' },
+        //             guide: { visible: true },
+        //             label: { text: "Count", fontFamily: "Helvetica", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
+        //         },
+        //         legend: {
+        //             layout: 'x3',
+        //             align: 'center',
+        //             adjustLayout: true,
+        //             shadow: false,
+        //             overflow: 'page',
+        //             alpha: 0.05,
+        //             marker: { type: 'rectangle', borderColor: 'none', size: 12 },
+        //             borderWidth: 0,
+        //             maxItems: 3,
+        //             toggleAction: 'hide',
+        //             pageOn: { backgroundColor: '#000', size: 10, alpha: 0.75 },
+        //             pageOff: { backgroundColor: '#7E7E7E', size: 10, alpha: 0.75 },
+        //             pageStatus: { color: 'black' }
+        //         },
+        //         plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15 },
+        //         series: legend_labels.map((label, i) => ({
+        //             text: label,
+        //             values: values[i],
+        //             backgroundColor: colors[i],
+        //             alpha: options?.alpha[i] || 1
+        //         }))
+        //     }
+        // }
 
-        /**
-         * Generates configuration for a 2-series bar chart.
-         * @param {Array} values - Array of arrays containing values for each series.
-         * @param {string} title - Title of the chart.
-         * @param {Array} x_axis - Labels for the x-axis.
-         * @param {string} y_axis - Label for the y-axis.
-         * @param {Array} legend_labels - Labels for the legend.
-         * @param {Array} colors - Colors for each series.
-         * @param {Object} options - Additional options like alpha values for each series.
-         * @returns {Object} - Configuration object for the 2-series bar chart.
-         */
-        function generateBar2Config(values, title, x_axis, y_axis, legend_labels, colors, options) {
-            return {
-                type: 'bar',
-                title: {
-                    text: title,
-                    backgroundColor: 'none',
-                    fontFamily: "verdana",
-                    fontColor: "#7E7E7E",
-                    fontSize: "22px",
-                    alpha: 1,
-                    adjustLayout: true
-                },
-                plotarea: { margin: 'dynamic' },
-                legend: {
-                    layout: 'x2',
-                    overflow: 'page',
-                    alpha: 0.05,
-                    shadow: false,
-                    align: 'center',
-                    adjustLayout: true,
-                    marker: { type: 'rectangle', borderColor: 'none', size: 18 },
-                    borderWidth: 0,
-                    maxItems: 3,
-                    toggleAction: 'hide',
-                    pageOn: { backgroundColor: '#000', size: 14, alpha: 1 },
-                    pageOff: { backgroundColor: '#7E7E7E', size: 14, alpha: 1 },
-                    pageStatus: { color: 'black' }
-                },
-                plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15 },
-                scaleY: {
-                    lineColor: '#7E7E7E',
-                    item: { fontColor: '#7e7e7e' },
-                    guide: { visible: true },
-                    label: { text: y_axis, fontFamily: "verdana", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
-                },
-                scaleX: {
-                    values: x_axis,
-                    placement: 'default',
-                    tick: { size: 10, placement: 'cross' },
-                    itemsOverlap: true,
-                    label: { text: "Window Height", fontFamily: "verdana", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
-                },
-                series: legend_labels.map((label, i) => ({
-                    text: label,
-                    values: values[i],
-                    backgroundColor: colors[i],
-                    alpha: options?.alpha[i] || 1
-                }))
-            }
-        }
+        // /**
+        //  * Generates configuration for a 2-series bar chart.
+        //  * @param {Array} values - Array of arrays containing values for each series.
+        //  * @param {string} title - Title of the chart.
+        //  * @param {Array} x_axis - Labels for the x-axis.
+        //  * @param {string} y_axis - Label for the y-axis.
+        //  * @param {Array} legend_labels - Labels for the legend.
+        //  * @param {Array} colors - Colors for each series.
+        //  * @param {Object} options - Additional options like alpha values for each series.
+        //  * @returns {Object} - Configuration object for the 2-series bar chart.
+        //  */
+        // function generateBar2Config(values, title, x_axis, y_axis, legend_labels, colors, options) {
+        //     return {
+        //         type: 'bar',
+        //         title: {
+        //             text: title,
+        //             backgroundColor: 'none',
+        //             fontFamily: "verdana",
+        //             fontColor: "#7E7E7E",
+        //             fontSize: "22px",
+        //             alpha: 1,
+        //             adjustLayout: true
+        //         },
+        //         plotarea: { margin: 'dynamic' },
+        //         legend: {
+        //             layout: 'x2',
+        //             overflow: 'page',
+        //             alpha: 0.05,
+        //             shadow: false,
+        //             align: 'center',
+        //             adjustLayout: true,
+        //             marker: { type: 'rectangle', borderColor: 'none', size: 18 },
+        //             borderWidth: 0,
+        //             maxItems: 3,
+        //             toggleAction: 'hide',
+        //             pageOn: { backgroundColor: '#000', size: 14, alpha: 1 },
+        //             pageOff: { backgroundColor: '#7E7E7E', size: 14, alpha: 1 },
+        //             pageStatus: { color: 'black' }
+        //         },
+        //         plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15 },
+        //         scaleY: {
+        //             lineColor: '#7E7E7E',
+        //             item: { fontColor: '#7e7e7e' },
+        //             guide: { visible: true },
+        //             label: { text: y_axis, fontFamily: "verdana", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
+        //         },
+        //         scaleX: {
+        //             values: x_axis,
+        //             placement: 'default',
+        //             tick: { size: 10, placement: 'cross' },
+        //             itemsOverlap: true,
+        //             label: { text: "Window Height", fontFamily: "verdana", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
+        //         },
+        //         series: legend_labels.map((label, i) => ({
+        //             text: label,
+        //             values: values[i],
+        //             backgroundColor: colors[i],
+        //             alpha: options?.alpha[i] || 1
+        //         }))
+        //     }
+        // }
 
-        /**
-         * Generates configuration for a pie chart.
-         * @param {Array} labels - Labels for the pie chart.
-         * @param {Array} values - Values for each slice.
-         * @param {string} title - Title of the chart.
-         * @param {Object} options - Additional options for the pie chart.
-         * @returns {Object} - Configuration object for the pie chart.
-         */
-        function generatePieConfig(labels = pieLabels, values = pieValues, title = 'Screen Width Distribution', options) {
-            return {
-                type: 'navpie',
-                title: { text: title },
-                options,
-                plot: {
-                    borderColor: "#fff",
-                    borderWidth: 2,
-                    valueBox: [
-                        {
-                            placement: 'out',
-                            text: '%t\n',
-                            fontSize: '14',
-                            fontFamily: "Open Sans"
-                        },
-                    ],
-                    tooltip: {
-                        fontSize: '14',
-                        fontFamily: "Open Sans",
-                        padding: "5 10",
-                        text: "%npv%<br>Count: %v"
-                    }
-                },
-                series: labels.map((label, i) => ({
-                    text: label,
-                    values: [values[i]]
-                }))
-            }
-        }
-
-        renderCharts();
+        // renderCharts();
 
     </script>
 </body>
