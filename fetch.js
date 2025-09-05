@@ -71,8 +71,14 @@ export async function userAgentsToWordCloud() {
   }
 }
 
+/**
+ * 
+ * @param {string} resource - column name to count values for 
+ * @returns an object with key-value pairs of unique values and their counts
+ * Example: { "en-US": 50, "fr-FR": 20, ... }
+ */
 export async function countKeyValue(resource) {
-  const data = await getData("static", [`"${resource}"`]);
+  const data = await getData("static", [resource]);
   return data.reduce((acc, item) => {
     const index = item.resource;
     acc[index] = (acc[index] || 0) + 1;
