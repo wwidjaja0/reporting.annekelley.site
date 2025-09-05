@@ -103,12 +103,12 @@
     </section>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
-        import { getData, userAgentsToWordCloud } from '/fetch.js';
+        import { getData, userAgentsToWordCloud, countKeyValue } from '/fetch.js';
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
-        let userLangConfig = generateBarConfig({Accepts: 70, Rejects: 30});
+        let userLangConfig = generateBarConfig(await countKeyValue('userLang'));
         let acceptsCookiesConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
         let allowsJavaScriptConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
         let allowsImagesConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});

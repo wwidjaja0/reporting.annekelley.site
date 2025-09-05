@@ -70,3 +70,13 @@ export async function userAgentsToWordCloud() {
     return "";
   }
 }
+
+export async function countKeyValue(resource) {
+  const data = await getData("static", [`"${resource}"`]);
+  return data.reduce((acc, item) => {
+    const index = item.resource;
+    acc[index] = (acc[index] || 0) + 1;
+    return acc;
+  }, {});
+}
+
