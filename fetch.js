@@ -79,8 +79,6 @@ export async function userAgentsToWordCloud() {
 export async function countKeyValue(colName) {
   const data = await getData("static", [colName]);
 
-  console.log(data);
-
   return data.reduce((acc, item) => {
     const index = item[colName];  // <-- dynamic lookup
     acc[index] = (acc[index] || 0) + 1;

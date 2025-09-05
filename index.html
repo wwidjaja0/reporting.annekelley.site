@@ -109,13 +109,13 @@
 
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
         let userLangConfig = generateBarConfig(await countKeyValue('userLang'));
-        let acceptsCookiesConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
-        let allowsJavaScriptConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
-        let allowsImagesConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
-        let allowsCSSConfig = generateNavPieConfig({Accepts: 70, Rejects: 30});
-        let userScreenDimensionsConfig = generateBarConfig({Accepts: 70, Rejects: 30});
-        let userWindowDimensionsConfig = generateBarConfig({Accepts: 70, Rejects: 30});
-        let userNetConnTypeConfig = generateBarConfig({Accepts: 70, Rejects: 30});
+        let acceptsCookiesConfig = generateNavPieConfig(await countKeyValue('acceptsCookies'));
+        let allowsJavaScriptConfig = generateNavPieConfig(await countKeyValue('allowsJavaScript'));
+        let allowsImagesConfig = generateNavPieConfig(await countKeyValue('allowsImages'));
+        let allowsCSSConfig = generateNavPieConfig(await countKeyValue('allowsCSS'));
+        let userScreenDimensionsConfig = generateBarConfig(await countKeyValue('userScreenDimensions'));
+        let userWindowDimensionsConfig = generateBarConfig(await countKeyValue('userWindowDimensions'));
+        let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
         let pageLoadStartConfig = generateHorizontalBoxPlot();
         let pageLoadEndConfig = generateHorizontalBoxPlot();
