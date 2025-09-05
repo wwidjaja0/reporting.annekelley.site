@@ -4,43 +4,294 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Visuals</title>
-    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
+    <script src="https://cdn.zingchart.com/zingchart.min.js" defer></script>
 </head>
 
 <body>
     <!-- ZingChart -->
     <style>
-        #charts {
+        section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(1fr));
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fit);
+            gap: 1rem;
+            padding: 1rem;
         }
 
-        #charts>div {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            padding: 10px;
+        visual-chart {
+            background: #eee;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+            padding: 1rem;
+        }
+
+        visual-grid {
+            background: #eee;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+            padding: 1rem;
         }
     </style>
 
-    <p style="font-size: xx-large; display: flex; justify-content: center;">Try clicking on things!</p>
+    <h1><a href="https://annekelley.site/">annekelley.site</a> Dashboard</h1>
+    <p>Hint: Try clicking on different things and using your mouse to navigate around the charts!</p>
 
-    <div id="charts">
-        <div id="bar3"></div>
-        <div id="bar2"></div>
-        <div id="pie"></div>
-        <div id="cookies"></div>
-        <div id="javascript"></div>
-        <div id="network"></div>
-        <div id="languages"></div>
-    </div>
+    <section>
+        <h2>Static Data</h2>
+        <visual-chart id="userAgent">
+            <h3>Most Common Browser Clients - userAgent</h3>
+            <p>A <em>word cloud</em> displaying the most frequent browser agent received.</p>
+        </visual-chart>
+        <visual-chart id="userLang">
+            <h3>Most Common Browser Languages - userLang</h3>
+            <p>A <em>bar chart</em> displaying the most frequent languages on the site.</p>
+        </visual-chart>
+        <visual-chart id="acceptsCookies">
+            <h3>acceptsCookies</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="allowsJavaScript">
+            <h3>allowsJavaScript</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="allowsImages">
+            <h3>allowsImages</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="allowsCSS">
+            <h3>allowsCSS</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="userScreenDimensions">
+            <h3>userScreenDimensions</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="userWindowDimensions">
+            <h3>userWindowDimensions</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="userNetConnType">
+            <h3>userNetConnType</h3>
+            <p></p>
+        </visual-chart>
+    </section>
+    <section>
+        <h2>Performance Data</h2>
+        <visual-chart id="pageLoadStart">
+            <h3>pageLoadStart</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="pageLoadEnd">
+            <h3>pageLoadEnd</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="pageLoadTimeTotal">
+            <h3>pageLoadTimeTotal</h3>
+            <p></p>
+        </visual-chart>
+    </section>
+    <section>
+        <h2>Activity Data</h2>
+        <visual-chart id="mouseHeatmap">
+            <h3>mouseHeatmap</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="errors">
+            <h3>errors</h3>
+            <p></p>
+        </visual-chart>
+    </section>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
         import { getData } from '/fetch.js';
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
+
+        let userAgentConfig = {
+            type: 'wordcloud',
+            options: {
+                text: 'TO REPLACE WITH API DATA.', // aggregated text
+                aspect: 'flow-center',
+                maxItems: 40,
+                style: {
+                    hoverState: {
+                        backgroundColor: 'orange',
+                        borderRadius: 2,
+                        fontColor: 'black'
+                    },
+
+                    tooltip: {
+                        text: '%text: %hits',
+                        visible: true,
+                        alpha: 0.8,
+                        backgroundColor: 'black',
+                        borderRadius: 8,
+                        borderColor: 'none',
+                        fontColor: 'yellow',
+                        fontSize: 14,
+                    }
+                }
+            }
+        };
+
+        let userLangConfig = {
+            type: "bar",
+            scaleX: {
+                values: ['en-US', 'en-GB', 'fr-FR', 'es-ES', 'de-DE'], // x-axis labels
+                item: {
+                    angle: -45,
+                },
+                step: 1,
+                'items-overlap': true
+            },
+            series: [
+                { values: [100, 10, 10, 10, 10, 0] } // y-axis values
+            ]
+        };
+
+        let acceptsCookiesConfig = {
+            type: "pie",
+            plot: {
+                detach: true,
+                valueBox: {
+                    text: '%t\n%npv%'
+                },
+                tooltip: {
+                    text: "%npv%<br>Count: %v"
+                },
+            },
+            series: [{
+                text: "Accepts",
+                values: [10]
+            },
+            {
+                text: "Rejects",
+                values: [5]
+            }]
+        };
+
+        let allowsJavaScriptConfig = {
+            type: "pie",
+            plot: {
+                detach: true,
+                valueBox: {
+                    text: '%t\n%npv%'
+                },
+                tooltip: {
+                    text: "%npv%<br>Count: %v"
+                },
+            },
+            series: [{
+                text: "Accepts",
+                values: [10]
+            },
+            {
+                text: "Rejects",
+                values: [5]
+            }]
+        };
+
+        let allowsImagesConfig = {
+            type: "pie",
+            plot: {
+                detach: true,
+                valueBox: {
+                    text: '%t\n%npv%'
+                },
+                tooltip: {
+                    text: "%npv%<br>Count: %v"
+                },
+            },
+            series: [{
+                text: "Accepts",
+                values: [10]
+            },
+            {
+                text: "Rejects",
+                values: [5]
+            }]
+        };
+
+        let allowsCSSConfig = {
+            type: "pie",
+            plot: {
+                detach: true,
+                valueBox: {
+                    text: '%t\n%npv%'
+                },
+                tooltip: {
+                    text: "%npv%<br>Count: %v"
+                },
+            },
+            series: [{
+                text: "Accepts",
+                values: [10]
+            },
+            {
+                text: "Rejects",
+                values: [5]
+            }]
+        };
+
+        let userScreenDimensionsConfig = {
+            type: "bar",
+            scaleX: {
+                values: ['720', '1080', '1440', '2160'], // x-axis labels
+                item: {
+                    angle: -45,
+                },
+                step: 1,
+                'items-overlap': true
+            },
+            series: [
+                { values: [100, 10, 10, 10] } // y-axis values
+            ]
+        };
+
+        let userWindowDimensionsConfig = {
+            type: "bar",
+            scaleX: {
+                values: ['720', '1080', '1440', '2160'], // x-axis labels
+                item: {
+                    angle: -45,
+                },
+                step: 1,
+                'items-overlap': true
+            },
+            series: [
+                { values: [100, 10, 10, 10] } // y-axis values
+            ]
+        };
+
+        let userNetConnTypeConfig = {
+            type: "bar",
+            scaleX: {
+                values: ['2g', '3g', '4g'], // x-axis labels
+                item: {
+                    angle: -45,
+                },
+                step: 1,
+                'items-overlap': true
+            },
+            series: [
+                { values: [100, 10, 10] } // y-axis values
+            ]
+        };
+
+        try {
+            zingchart.render({ id: 'userAgent', data: userAgentConfig, width: '100%' });
+            zingchart.render({ id: 'userLang', data: userLangConfig, width: '100%' });
+            zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
+            zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
+            zingchart.render({ id: 'allowsImages', data: allowsImagesConfig, width: '100%' });
+            zingchart.render({ id: 'allowsCSS', data: allowsCSSConfig, width: '100%' });
+            zingchart.render({ id: 'userScreenDimensions', data: userScreenDimensionsConfig, width: '100%' });
+            zingchart.render({ id: 'userWindowDimensions', data: userWindowDimensionsConfig, width: '100%' });
+            zingchart.render({ id: 'userNetConnType', data: userNetConnTypeConfig, width: '100%' });
+
+        } catch (e) {
+            console.error("Error rendering userAgent word cloud:", e);
+        }
 
         async function renderCharts() {
             try {
@@ -48,6 +299,12 @@
                 const rawStaticData = await getData('static',
                     ['userScreenWidth', 'userScreenHeight', 'userWindowWidth', 'userWindowHeight', 'userLang',
                         'userNetConnType', 'acceptsCookies', 'allowsJavaScript']);
+                // 3 series bar chart
+                // Comparing 3 groups of user screen width in terms of their screen height
+                parseCounts('bar3', [item.userScreenWidth, item.userScreenHeight], [bar1280Counts3, bar1920Counts3, barOtherCounts3], ['1280', '1920', 'other']);
+
+                // NOTE: Currently with the way 3 series bar charts are hard coded, other values are grouped together, might have to change this
+                // functionaliy to be more flexible with a different kind of bar3 configuration/style, but with the current
 
                 console.log("Fetched static data:", rawStaticData);
 
@@ -322,7 +579,7 @@
                 scaleX: {
                     values: x_axis,
                     zooming: true,
-                    zoomTo: [0,50],
+                    zoomTo: [0, 50],
                     item: {
                         fontSize: 10
                     },
