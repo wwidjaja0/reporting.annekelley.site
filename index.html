@@ -131,7 +131,6 @@
          * @returns {Object} - Configuration object for the word cloud.
          */
         function generateWordCloudConfig(textData = "", otherOptions) {
-            console.log(textData);
             return {
                 type: 'wordcloud',
                 options: {
@@ -168,6 +167,7 @@
          * @returns {Object} - Configuration object for the bar chart.
          */
         function generateBarConfig(keyValuePairs = {}, otherOptions) {
+            console.log("Generating bar config with data:", keyValuePairs);
             return {
                 type: "bar",
                 scaleX: {
