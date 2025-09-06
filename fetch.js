@@ -16,6 +16,7 @@ export async function getData(resource, cols) {
   const url = `/proxy.php?${query}`;
 
   try {
+    console.log("Fetching data from:", url);
     const response = await fetch(url, { method: "GET" });
 
     if (!response.ok) {

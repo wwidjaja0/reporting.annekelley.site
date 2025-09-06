@@ -221,32 +221,23 @@
             return {
                 "graphset": [{
                     "type": "hboxplot",
-                    "plotarea": {
-                        "margin": "100"
-                    },
+                    // "plotarea": {
+                    //     "margin": "100"
+                    // },
                     "scaleX": {
-                        "guide": {
-                            "visible": false
-                        },
-                        "label": {
-                            "text": "Experiment No."
-                        },
-                        "values": ["1", "2", "3", "4", "5"],
-                        "item": {
-                            "wrapText": true
-                        }
+                        "values": ["1"],
                     },
                     "scaleY": {
-                        "minValue": "auto",
-                        "guide": {
-                            "lineStyle": "solid"
-                        },
+                        // "minValue": "auto",
+                        // "guide": {
+                        //     "lineStyle": "solid"
+                        // },
                         "label": {
-                            "text": "Observations"
+                            "text": "Milliseconds (ms)"
                         },
-                        "item": {
-                            "wrapText": true
-                        }
+                        // "item": {
+                        //     "wrapText": true
+                        // }
                     },
                     "tooltip": {
                         "fontSize": 11,
@@ -258,24 +249,21 @@
                         "padding": 10,
                         "color": "#000"
                     },
-                    "plot": {
-
-                    },
                     "options": {
                         "box": {
-                            "barWidth": 0.5,
+                            // "barWidth": 0.5,
                             "tooltip": {
-                                "text": "<span style=\"font-style:italic;\">Experiment no. %scale-key-text</span><br><b style=\"font-size:15px;color:%color3\">Observations:</b><br><br>Maximum: <b>%data-max</b><br>Upper Quartile: <b>%data-upper-quartile</b><br>Median: <b>%data-median</b><br>Lower Quartile: <b>%data-lower-quartile</b><br>Minimum: <b>%data-min</b>"
+                                "text": "Observations:<br>Maximum: <strong>%data-max</strong><br>Upper Quartile: <strong>%data-upper-quartile</strong><br>Median: <strong>%data-median</strong><br>Lower Quartile: <strong>%data-lower-quartile</strong><br>Minimum: <strong>%data-min</strong>"
                             }
                         },
-                        "outlier": {
-                            "tooltip": {
-                                "text": "<span style=\"font-style:italic;\">Experiment no. %scale-key-text</span><br><b style=\"font-size:15px;color:%color-7\">Observation: %node-value</b>"
-                            },
-                            "marker": {
-                                "type": "circle"
-                            }
-                        }
+                        // "outlier": {
+                        //     "tooltip": {
+                        //         "text": "%node-value"
+                        //     },
+                        //     "marker": {
+                        //         "type": "circle"
+                        //     }
+                        // }
                     },
                     "series": [{
                         "dataBox": [
