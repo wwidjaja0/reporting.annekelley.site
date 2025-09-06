@@ -96,3 +96,16 @@ export async function countKeyValue(colName) {
   }, {});
 }
 
+export async function errorsToWordCloud() {
+  try {
+    const data = await getData("activity", ["error"]); // returns array of { error: "..." }
+
+    return data
+      .map(item => item.error?.trim())  // get error string
+      .filter(err => err && err.length > 0) // drop empty ones
+      .join(" "); // big string for ZingChart
+  } catch (err) {
+    console.error("Error processing errors:", err);
+    return "";
+  }
+}

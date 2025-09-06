@@ -103,7 +103,7 @@
     </section>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
-        import { getData, userAgentsToWordCloud, countKeyValue } from '/fetch.js';
+        import { getData, userAgentsToWordCloud, countKeyValue, errorsToWordCloud } from '/fetch.js';
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
@@ -122,7 +122,7 @@
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot();
 
         let mouseHeatmapConfig = generateHeatMap('mouseHeatmap');
-        let errorsConfig = generateWordCloudConfig();
+        let errorsConfig = generateWordCloudConfig(errorsToWordCloud());
 
         /**
          * Generates configuration for a word cloud chart.
