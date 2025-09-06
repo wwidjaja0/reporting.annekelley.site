@@ -226,7 +226,6 @@
                         margin: 'dynamic'
                     },
                     scaleY: {
-                        minValue: 0,
                         label: {
                             text: "Milliseconds (ms)"
                         },
@@ -257,7 +256,7 @@
                         }
                     },
                     series: [{
-                        dataBox: [values],
+                        dataBox: values,
                     }],
                     otherOptions
                 }]
@@ -293,8 +292,6 @@
             zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
             zingchart.render({ id: 'allowsImages', data: allowsImagesConfig, width: '100%' });
             zingchart.render({ id: 'allowsCSS', data: allowsCSSConfig, width: '100%' });
-            zingchart.render({ id: 'userScreenDimensions', data: userScreenDimensionsConfig, width: '100%' });
-            zingchart.render({ id: 'userWindowDimensions', data: userWindowDimensionsConfig, width: '100%' });
             zingchart.render({ id: 'userNetConnType', data: userNetConnTypeConfig, width: '100%' });
 
             zingchart.render({ id: 'pageLoadStart', data: pageLoadStartConfig, width: '100%' });
