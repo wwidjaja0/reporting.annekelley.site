@@ -219,6 +219,24 @@
          * @returns {Object} - Configuration object for the horizontal box plot.
          */
         function generateHorizontalBoxPlot(values, otherOptions) {
+
+            values.sort((a, b) => a - b); // Sort values in ascending order
+
+            const median = values[Math.floor(values.length / 2)];
+            const Q1 = values[Math.floor(values.length / 4)];
+            const Q3 = values[Math.floor((3 * values.length) / 4)];
+            const IQR = Q3 - Q1;
+            const lowerFence = Q1 - 1.5 * IQR;
+            const upperFence = Q3 + 1.5 * IQR;
+            const outliers = values.filter(v => v < lowerFence || v > upperFence);
+            const boxPlotValues = [
+                Math.max(Math.min(...values.filter(v => v >= lowerFence)), Math.min(...values)), // min (excluding outliers)
+                Q1, // lower quartile
+                median, // median
+                Q3, // upper quartile
+                Math.min(Math.max(...values.filter(v => v <= upperFence)), Math.max(...values)) // max (excluding outliers)
+            ];
+
             return {
                 graphset: [{
                     type: "hboxplot",
@@ -256,7 +274,8 @@
                         }
                     },
                     series: [{
-                        dataBox: values,
+                        dataBox: [boxPlotValues],
+                        dataOutlier: [outliers]
                     }],
                     otherOptions
                 }]
