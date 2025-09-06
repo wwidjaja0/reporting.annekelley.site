@@ -9,32 +9,27 @@ Returns JSON encoding of response
 */
 
 export async function getData(resource, cols) {
-  // Build query string
-  const query = `resource=${encodeURIComponent(resource)}&` + cols.join("&");
+  // cols is an array like ["userLang", "userAgent"]
+  const query = `resource=${encodeURIComponent(resource)}&cols=${cols.join(",")}`;
 
-  // Build URL
-  const url = `https://annekelley.site/api.php/?${query}`;
+  // Call your proxy (NOT the remote API directly!)
+  const url = `/proxy.php?${query}`;
 
   try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        // Basic auth header
-        "Authorization": "Basic " + btoa('Anne:f0ll0werofLuthien1902!')
-      }
-    });
+    const response = await fetch(url, { method: "GET" });
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const data = await response.json(); // assumes API returns JSON
+    const data = await response.json(); // your proxy returns JSON
     return data;
   } catch (error) {
     console.error("Fetch failed:", error);
     throw error;
   }
 }
+
 
 
 export async function userAgentsToWordCloud() {
