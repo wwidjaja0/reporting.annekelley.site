@@ -122,7 +122,7 @@
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot();
 
         let mouseHeatmapConfig = generateHeatMap('mouseHeatmap');
-        let errorsConfig = generateWordCloudConfig(errorsToWordCloud());
+        let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
 
         /**
          * Generates configuration for a word cloud chart.
