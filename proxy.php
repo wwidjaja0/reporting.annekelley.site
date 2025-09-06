@@ -19,6 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $resource = $_GET['resource'] ?? '';
 $cols     = $_GET['cols'] ?? '';
 
+print_r($cols);
+
 // Handle array of cols (cols[]=userLang&cols[]=userAgent)
 if (is_array($cols)) {
     $cols = implode(',', $cols); // turn into "userLang,userAgent"
