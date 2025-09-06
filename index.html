@@ -219,15 +219,15 @@
          */
         function generateHorizontalBoxPlot() {
             return {
-                "graphset": [{
-                    "type": "hboxplot",
+                graphset: [{
+                    type: "hboxplot",
                     // "plotarea": {
                     //     "margin": "100"
                     // },
-                    "scaleX": {
+                    scaleX: {
                         "values": ["1"],
                     },
-                    "scaleY": {
+                    scaleY: {
                         // "minValue": "auto",
                         // "guide": {
                         //     "lineStyle": "solid"
@@ -239,46 +239,30 @@
                         //     "wrapText": true
                         // }
                     },
-                    "tooltip": {
-                        "fontSize": 11,
-                        "align": "left",
-                        "borderRadius": 7,
-                        "borderWidth": 1,
-                        "backgroundColor": "#fff",
-                        "alpha": 0.9,
-                        "padding": 10,
-                        "color": "#000"
+                    tooltip: {
+                        text: '%text: %hits',
+                        visible: true,
+                        alpha: 0.8,
+                        backgroundColor: 'black',
+                        borderRadius: 8,
+                        borderColor: 'none',
+                        fontColor: 'yellow',
+                        fontSize: 14,
                     },
-                    "options": {
-                        "box": {
+                    options: {
+                        box: {
                             // "barWidth": 0.5,
-                            "tooltip": {
-                                "text": "Observations:<br>Maximum: <strong>%data-max</strong><br>Upper Quartile: <strong>%data-upper-quartile</strong><br>Median: <strong>%data-median</strong><br>Lower Quartile: <strong>%data-lower-quartile</strong><br>Minimum: <strong>%data-min</strong>"
+                            tooltip: {
+                                text: "Observations:<br>Maximum: <strong>%data-max</strong><br>Upper Quartile: <strong>%data-upper-quartile</strong><br>Median: <strong>%data-median</strong><br>Lower Quartile: <strong>%data-lower-quartile</strong><br>Minimum: <strong>%data-min</strong>"
                             }
                         },
-                        // "outlier": {
-                        //     "tooltip": {
-                        //         "text": "%node-value"
-                        //     },
-                        //     "marker": {
-                        //         "type": "circle"
-                        //     }
-                        // }
                     },
-                    "series": [{
-                        "dataBox": [
+                    series: [{
+                        dataBox: [
                             [760, 801, 848, 895, 965],
-                            [733, 853, 939, 980, 1080],
-                            [714, 762, 817, 870, 918],
-                            [724, 802, 836, 871, 950],
-                            [834, 856, 864, 882, 910]
                         ],
-                        "dataOutlier": [
+                        dataOutlier: [
                             [0, 644],
-                            [1, 718],
-                            [4, 951],
-                            [3, 969],
-                            [2, 944]
                         ]
                     }]
                 }]
