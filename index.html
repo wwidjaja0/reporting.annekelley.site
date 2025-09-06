@@ -103,7 +103,7 @@
     </section>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
-        import { getData, userAgentsToWordCloud, countKeyValue, errorsToWordCloud } from '/fetch.js';
+        import { getData, userAgentsToWordCloud, countKeyValue, errorsToWordCloud, count } from '/fetch.js';
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
@@ -117,9 +117,9 @@
         let userWindowDimensionsConfig = generateBarConfig();
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
-        let pageLoadStartConfig = generateHorizontalBoxPlot();
-        let pageLoadEndConfig = generateHorizontalBoxPlot();
-        let pageLoadTimeTotalConfig = generateHorizontalBoxPlot();
+        let pageLoadStartConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
+        let pageLoadEndConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
+        let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
 
         let mouseHeatmapConfig = generateHeatMap('mouseHeatmap');
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
@@ -215,9 +215,10 @@
 
         /**
          * Generates configuration for a horizontal box plot chart.
+         * @param {Array} values - Array of numerical values for the box plot.
          * @returns {Object} - Configuration object for the horizontal box plot.
          */
-        function generateHorizontalBoxPlot() {
+        function generateHorizontalBoxPlot(values, otherOptions) {
             return {
                 graphset: [{
                     type: "hboxplot",
@@ -244,13 +245,9 @@
                         },
                     },
                     series: [{
-                        dataBox: [
-                            [760, 801, 848, 895, 965],
-                        ],
-                        dataOutlier: [
-                            [0, 644],
-                        ]
-                    }]
+                        dataBox: [values],
+                    }],
+                    otherOptions
                 }]
             };
         }

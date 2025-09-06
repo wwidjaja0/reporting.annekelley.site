@@ -110,3 +110,10 @@ export async function errorsToWordCloud() {
     return "";
   }
 }
+
+export async function count(colName) {
+  const data = await getData("performance", [colName]);
+
+  // return the values as an array
+  return data.map(item => item[colName]);
+}
