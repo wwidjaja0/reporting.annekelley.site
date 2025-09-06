@@ -222,9 +222,13 @@
             return {
                 graphset: [{
                     type: "hboxplot",
+                    plotarea: {
+                        margin: 'dynamic'
+                    },
                     scaleY: {
-                        "label": {
-                            "text": "Milliseconds (ms)"
+                        minValue: "auto",
+                        label: {
+                            text: "Milliseconds (ms)"
                         },
                     },
                     tooltip: {
