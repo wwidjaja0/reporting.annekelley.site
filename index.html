@@ -118,8 +118,8 @@
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
         let pageLoadStartConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
-        let pageLoadEndConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
-        let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
+        let pageLoadEndConfig = generateHorizontalBoxPlot(await count('pageLoadEnd'));
+        let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
         let mouseHeatmapConfig = generateHeatMap('mouseHeatmap');
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
