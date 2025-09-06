@@ -8,20 +8,34 @@ Returns JSON encoding of response
  !--- Need to get the JSON encoding into the right format for ZingChart ---!
 */
 
-export async function getData(resource, colNames) {
-  const cols = colNames.join("&");
-  const url = `/proxy.php?resource=${encodeURIComponent(resource)}&cols=${encodeURIComponent(cols)}`;
+export async function getData(resource, cols) {
+  // Build query string
+  const query = `resource=${encodeURIComponent(resource)}&` + cols.join("&");
+
+  // Build URL
+  const url = `https://annekelley.site/api.php/?${query}`;
 
   try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const result = await response.json();
-    console.log("Proxy response:", result);
-    return result;
-  } catch (err) {
-    console.error("Proxy fetch failed:", err);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        // Basic auth header
+        "Authorization": "Basic " + btoa('Anne:f0ll0werofLuthien1902!')
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json(); // assumes API returns JSON
+    return data;
+  } catch (error) {
+    console.error("Fetch failed:", error);
+    throw error;
   }
 }
+
 
 export async function userAgentsToWordCloud() {
   try {
