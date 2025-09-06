@@ -62,14 +62,6 @@
             <h3>allowsCSS</h3>
             <p>A <em>pie chart</em> displaying the % of users that allow CSS.</p>
         </visual-chart>
-        <visual-chart id="userScreenDimensions">
-            <h3>userScreenDimensions</h3>
-            <p></p>
-        </visual-chart>
-        <visual-chart id="userWindowDimensions">
-            <h3>userWindowDimensions</h3>
-            <p></p>
-        </visual-chart>
         <visual-chart id="userNetConnType">
             <h3>userNetConnType</h3>
             <p>A <em>bar chart</em> displaying the most frequent network connection.</p>
@@ -113,8 +105,6 @@
         let allowsJavaScriptConfig = generateNavPieConfig(await countKeyValue('allowsJavaScript'));
         let allowsImagesConfig = generateNavPieConfig(await countKeyValue('allowsImages'));
         let allowsCSSConfig = generateNavPieConfig(await countKeyValue('allowsCSS'));
-        let userScreenDimensionsConfig = generateBarConfig();
-        let userWindowDimensionsConfig = generateBarConfig();
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
         let pageLoadStartConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
