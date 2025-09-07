@@ -13,7 +13,10 @@
         section { background:#eee;border-radius:1rem;padding:1.5rem;margin-top:1.25rem;max-width:960px;margin-left:auto;margin-right:auto }
         .grid-card, .chart-card { background:#fff;border-radius:0.75rem;padding:1rem;box-shadow:0 0.5rem 1rem rgba(0,0,0,0.12);margin-top:1rem }
         .card-row { display:flex;gap:1rem;flex-wrap:wrap }
-        .small-chart { width:320px; }
+    .small-chart { width:320px; }
+    /* chart container with background image and overlayed chart */
+    .chart-with-bg { position: relative; background-size: cover; background-position: center; border-radius: 0.5rem; overflow: hidden; }
+    .chart-with-bg .chart-overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
@@ -35,13 +38,13 @@
     <section aria-label="Activity Data">
         <h2>Mouse Clicks</h2>
         <div class="card-row">
-            <div class="chart-card small-chart">
-                <h3>Home Page Clicks</h3>
-                <div id="mouseScatterplotHomePreview" style="width:100%;height:300px"></div>
+            <div class="chart-card small-chart chart-with-bg" style="background-image: url('/annetop.png'); height:300px;">
+                <h3 style="margin-top:0">Home Page Clicks</h3>
+                <div id="mouseScatterplotHomePreview" class="chart-overlay"></div>
             </div>
-            <div class="chart-card small-chart">
-                <h3>404 Page Clicks</h3>
-                <div id="mouseScatterplot404Preview" style="width:100%;height:300px"></div>
+            <div class="chart-card small-chart chart-with-bg" style="background-image: url('/annebottom.png'); height:300px;">
+                <h3 style="margin-top:0">404 Page Clicks</h3>
+                <div id="mouseScatterplot404Preview" class="chart-overlay"></div>
             </div>
         </div>
     </section>
@@ -67,9 +70,10 @@
         function generateScatterConfig(clicks){
             const scatterData = (clicks||[]).map(i=>[parseInt(i.clientX,10)||0, parseInt(i.clientY,10)||0]);
             const maxX = Math.max(...scatterData.map(d=>d[0]).filter(v=>!isNaN(v)),0); const maxY = Math.max(...scatterData.map(d=>d[1]).filter(v=>!isNaN(v)),0);
-            return {
-                type:'hscatter', plot:{ marker:{ type:'circle', size:4, backgroundColor:'#ff0000' }, tooltip:{ text:'Click at (%kvx, %kvy)' } },
-                scaleX:{ values:`0:${maxX}:${Math.round(maxX/10)||1}`, visible:true }, scaleY:{ values:`0:${maxY}:${Math.round(maxY/10)||1}`, visible:true }, series:[{ values: scatterData }]
+        return {
+            type:'hscatter', backgroundColor: 'transparent', plot:{ marker:{ type:'circle', size:6, backgroundColor:'#ff0000' }, tooltip:{ text:'Click at (%kvx, %kvy)' } },
+            plotarea: { margin: '10 10 10 10', backgroundColor:'transparent' },
+            scaleX:{ values:`0:${maxX}:${Math.round(maxX/10)||1}`, visible:true }, scaleY:{ values:`0:${maxY}:${Math.round(maxY/10)||1}`, visible:true }, series:[{ values: scatterData }]
             };
         }
 

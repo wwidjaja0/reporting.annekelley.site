@@ -66,7 +66,7 @@
 </head>
 
 <body>
-    <h1>reporting.annekelley.site User Language Report</h1>
+    <h1><a href="/">reporting.annekelley.site</a> — User Language Report</h1>
 
     <nav style="margin-top:0.5rem;">
         <a href="/index.html">Dashboard</a> ·
@@ -127,13 +127,16 @@
                 const pieLabels = langData.map(row => row.language);
                 const pieValues = langData.map(row => parseInt(row.count, 10));
                 const userLangColors = ["#27ae60", "#e74c3c", "#f5cba7", "#7f8c8d", "#16a085"];
-                const userLangPie = generatePieConfig(pieLabels, pieValues,
-                    {
-                        threshold: "15%",
-                        others: { text: "Others", backgroundColor: "#2980b9" },
-                        slice: 0.6
-                    }, userLangColors.slice(0,pieValues.length)
-                );
+                // simple pie: if labels include Yes/No, color them specifically
+                const palette = { Yes: '#16a34a', No: '#dc2626' };
+                const userLangPie = {
+                    type: 'navpie', plot: {
+                        borderColor: "#fff", borderWidth: 2,
+                        valueBox: [{ placement: 'out', text: '%t\n', fontSize: '14' }],
+                        tooltip: { fontSize: '14', padding: '5 10', text: '%npv%<br>Count: %v' }
+                    },
+                    series: pieLabels.map((label, i) => ({ text: label, values: [pieValues[i]], backgroundColor: palette[label] || userLangColors[i] }))
+                };
                 zingchart.render({ id: 'userLangPie', data: JSON.stringify(userLangPie), width: 500, height: 400 });
             } catch (err) {
                 console.error("Error rendering charts:", err);

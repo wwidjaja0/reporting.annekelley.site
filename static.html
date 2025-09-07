@@ -49,10 +49,11 @@
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
         function generateNavPieConfig(keyValuePairs = {}) {
+            const palette = { Yes: '#16a34a', No: '#dc2626' };
             return {
                 type: 'navpie',
                 plot: { detach: true, valueBox: { text: '%t\n%npv%' }, tooltip: { text: '%npv%<br>Count: %v' } },
-                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value] }))
+                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value], backgroundColor: palette[key] || undefined }))
             };
         }
 
