@@ -339,11 +339,11 @@
                     }
                 },
                 scaleX: {
-                    values: `0:100:10`,
+                    values: `0:${maxX}:${Math.round(maxX / 10) || 1}`,
                     visible: true
                 },
                 scaleY: {
-                    values: `0:100:10`,
+                    values: `0:${maxY}:${Math.round(maxY / 10) || 1}`,
                     visible: true
                 },
                 series: [
