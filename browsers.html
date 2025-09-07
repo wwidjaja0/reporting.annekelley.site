@@ -73,14 +73,13 @@
     </style>
 </head>
 <body>
-    <h1>
-    <a href="https://annekelley.site/">annekelley.site</a> Browsers and Errors Report
-    </h1>
+    <h1>reporting.annekelley.site Browsers and Errors Report</h1>
 
     <nav style="margin-top:0.5rem;">
         <a href="/index.html">Dashboard</a> ·
         <a href="/static.html">Static Report</a> ·
-        <a href="/dynamic.html">Dynamic Report</a>
+        <a href="/dynamic.html">Dynamic Report</a> ·
+        <a href="/langs.html">Languages Report</a>
     </nav>
 
     <!-- SECTION: Question -->
@@ -136,7 +135,7 @@
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
         async function renderChart() {
         try {
-            const resp = await fetch('/endpoint.php/reports/browser-types');
+                const resp = await fetch('/endpoint.php/reports/browser-types');
             const userAgentData = await resp.json();
             const browsers = ["Chrome", "Safari", "Firefox"];
             const platforms = ["Windows", "Mac", "iOS", "Linux"];
