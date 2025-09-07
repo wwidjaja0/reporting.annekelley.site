@@ -9,7 +9,10 @@ As firm believers in progressive enhancement, we rely on log files first and use
 
 
 ## Dashboard
-We offer an explanation of all our design decisions, including the chart types representing our data, the metrics we worked with, and so on. 
+The charts and grids displayed on the dashboard fall into three main categories: user resources, user languages, and browser types. We chose to display all of them on the grid for general perusual, yet we also involved each of these data visuals in a report. We are firm believers in data for a purpose and not just for show. As a result, all of the metrics, chart choices, and other design selections of our dashboard are detailed in the Report section.
+
+## Report
+We will now detail the metrics we chose to report on, our chart and grid selections, and general design decisions. We tie our interest in each metric to concrete and important points learned in class.
 
 ### User Resources Metric
 Throughout this course, we have discussed the importance of prioritizing user experience. In order to ensure a good time for the user, we must grasp what resources they have so that we can work with them to better the user's experience.
@@ -22,12 +25,9 @@ We made the following design decisions for the two corresponding data visuals:
  - Coloring scheme: We colored the "Yes" slice green, signalling that this corresponds to what we would hope for, and the "No" slice red, to communicate that the no is the less favorable result. 
 
 ### Network Connectivity Grid
-Network connectivity is another important user resource. Understanding it helps a developer appropriately prioritize critical traffic and implement retries, error correction, and fallback mechanisms.
+Network connectivity is another important user resource. Understanding it helps a developer appropriately prioritize critical traffic and implement retries, error correction, and fallback mechanisms. 
 
- 
-
-## Report
-Provide a written explanation of your design decisions (which metric you decided to report on, which chart types you chose for which data, what metrics you decided to display and why, etc). Be thorough in your explanation to demonstrate to the teaching team that you explored your options and made your decisions based on legitimate reasoning and user centered thinking.
+We went with a grid because we wanted to show both the number of users in each of the network connectivity categories as well as each group's average runtime. The numbers enable us understand how impactful our decisions of handling different amounts of connectivity are. The average runtime gives us a sense of how effective our approaches to dealing with network connectivity have been thus far. To show both of these dimensions for each network connectivity group in an easier, uncluttered way, we opted for a grid.
 
 ### User Language Metric
 During a lecture, Professor Powell noted how some sites will often route a user to pages in their native language based on their userLang header. We wondered if it would be worthwhile to prepare different language versions of our pages and set up such a routing for our own site. 
