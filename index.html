@@ -120,7 +120,56 @@
         }
         renderUserNetConnGrid(userNetConnTypeRaw);
 
-        let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
+        // Replace the boxplot with a summary grid for page load times
+        const pageLoadTimeValues = await count('pageLoadTimeTotal');
+        function computeStats(values = []) {
+            const nums = values.map(v => Number(v)).filter(v => !Number.isNaN(v)).sort((a,b)=>a-b);
+            const n = nums.length;
+            if (n === 0) return {};
+            const sum = nums.reduce((s,x)=>s+x,0);
+            const mean = sum / n;
+            const median = nums[Math.floor(n/2)];
+            const Q1 = nums[Math.floor(n/4)];
+            const Q3 = nums[Math.floor((3*n)/4)];
+            const min = nums[0];
+            const max = nums[n-1];
+            const variance = nums.reduce((s,x)=>s+Math.pow(x-mean,2),0)/n;
+            const std = Math.sqrt(variance);
+            return { count: n, min, Q1, median, Q3, max, mean, std };
+        }
+
+        function renderPageLoadTimeGrid(values) {
+            try {
+                const stats = computeStats(values || []);
+                const container = document.getElementById('pageLoadTimeTotal');
+                if (!container) return;
+                const rows = [
+                    { metric: 'Count', value: stats.count || 0 },
+                    { metric: 'Min (ms)', value: Math.round(stats.min || 0) },
+                    { metric: 'Q1 (ms)', value: Math.round(stats.Q1 || 0) },
+                    { metric: 'Median (ms)', value: Math.round(stats.median || 0) },
+                    { metric: 'Q3 (ms)', value: Math.round(stats.Q3 || 0) },
+                    { metric: 'Max (ms)', value: Math.round(stats.max || 0) },
+                    { metric: 'Mean (ms)', value: Math.round(stats.mean || 0) },
+                    { metric: 'Std Dev (ms)', value: Math.round(stats.std || 0) }
+                ];
+                const grid = document.createElement('zing-grid');
+                grid.setAttribute('page-size', '10');
+                grid.setAttribute('page-size-options', '5,10');
+                grid.setAttribute('sort-on-load', 'false');
+                grid.data = rows;
+                grid.columns = [
+                    { index: 'metric', header: 'Metric', type: 'string' },
+                    { index: 'value', header: 'Value', type: 'number' }
+                ];
+                container.innerHTML = '';
+                container.appendChild(grid);
+            } catch (err) {
+                console.error('Error rendering page load time grid:', err);
+            }
+        }
+
+        renderPageLoadTimeGrid(pageLoadTimeValues);
 
         const activityData = await getData('activity', ['eventType', 'clientX', 'clientY', 'url']);
 
@@ -305,7 +354,7 @@
             zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
             zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
 
-            zingchart.render({ id: 'pageLoadTimeTotal', data: pageLoadTimeTotalConfig, width: '100%' });
+            // pageLoadTimeTotal is now rendered as a grid via renderPageLoadTimeGrid
 
             zingchart.render({ id: 'mouseScatterplotHome', data: scatterHomeConfig, width: '100%' });
             zingchart.render({ id: 'mouseScatterplot404', data: scatter404Config, width: '100%' });
