@@ -122,10 +122,10 @@
 
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
         let userLangConfig = generateBarConfig(await countKeyValue('static', 'userLang'));
-        let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'acceptsCookies')));
-        let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsJavaScript')));
-        let allowsImagesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsImages')));
-        let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsCSS')));
+        let acceptsCookiesConfig = generateNavPieConfig(await countKeyValue('static', 'acceptsCookies'));
+        let allowsJavaScriptConfig = generateNavPieConfig(await countKeyValue('static', 'allowsJavaScript'));
+        let allowsImagesConfig = generateNavPieConfig(await countKeyValue('static', 'allowsImages'));
+        let allowsCSSConfig = generateNavPieConfig(await countKeyValue('static', 'allowsCSS'));
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('static', 'userNetConnType'));
 
         let pageLoadStartConfig = generateBarConfig(await countKeyValue('performance', 'pageLoadStart'));
