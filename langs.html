@@ -117,7 +117,7 @@
 
         async function renderChart() {
             try {
-                const resp = await fetch('/endpoint.php/reports/user-langs');
+                const resp = await fetch('https://annekelley.site/endpoint.php/reports/user-langs');
                 const langData = await resp.json();
                 const pieLabels = langData.map(row => row.language);
                 const pieValues = langData.map(row => parseInt(row.count, 10));
@@ -165,7 +165,7 @@
 
         async function renderGrid() {
             try {
-                const resp = await fetch('/endpoint.php/reports/spanish-pages');
+                const resp = await fetch('https://annekelley.site/endpoint.php/reports/spanish-pages');
                 const data = await resp.json();
                 data.forEach(row => { row.Visits = parseInt(row.Visits, 10); });
                 const columns = [
