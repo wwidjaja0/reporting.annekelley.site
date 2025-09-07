@@ -111,6 +111,7 @@ export async function countKeyValue(colName) {
     };
   }
 
+  console.log(`Counts for ${colName}:`, counts);
   return counts;
 }
 
