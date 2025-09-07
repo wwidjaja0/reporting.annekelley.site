@@ -143,7 +143,7 @@
         const homePageClicks = activityData.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/index.html' || item.url === 'https://annekelley.site/');
         const cgiPerlBinClicks = activityData.filter(item => item.eventType === 'click' && String(item.url).includes('https://annekelley.site/cgi-bin/'));
         const page404Clicks = activityData.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/404.html');
-        const clicksFromMissingURL = activityData.filter(item => item.eventType === 'click' && item.url == null);
+        const clicksFromMissingURL = activityData.filter(item => item.eventType === 'click' && !item.url);
 
         let scatterHomeConfig = generateScatterPlot(homePageClicks);
         let scatterCGIConfig = generateScatterPlot(cgiPerlBinClicks);
