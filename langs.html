@@ -66,9 +66,14 @@
 </head>
 
 <body>
-    <h1>
-        <a href="https://annekelley.site/">annekelley.site</a> User Language Report
-    </h1>
+    <h1>reporting.annekelley.site User Language Report</h1>
+
+    <nav style="margin-top:0.5rem;">
+        <a href="/index.html">Dashboard</a> ·
+        <a href="/static.html">Static Report</a> ·
+        <a href="/dynamic.html">Dynamic Report</a> ·
+        <a href="/browsers.html">Browsers Report</a>
+    </nav>
 
     <!-- SECTION: Question -->
     <section aria-label="Report Question">
@@ -117,7 +122,7 @@
 
         async function renderChart() {
             try {
-                const resp = await fetch('https://reporting.annekelley.site/endpoint.php/reports/user-langs');
+                const resp = await fetch('/endpoint.php/reports/user-langs');
                 const langData = await resp.json();
                 const pieLabels = langData.map(row => row.language);
                 const pieValues = langData.map(row => parseInt(row.count, 10));
@@ -165,7 +170,7 @@
 
         async function renderGrid() {
             try {
-                const resp = await fetch('https://reporting.annekelley.site/endpoint.php/reports/spanish-pages');
+                const resp = await fetch('/endpoint.php/reports/spanish-pages');
                 const data = await resp.json();
                 data.forEach(row => { row.Visits = parseInt(row.Visits, 10); });
                 const columns = [

@@ -12,29 +12,47 @@
     <!-- ZingChart -->
     <style>
         :root{
-            --card-bg: #eee;
-            --card-radius: 1rem;
+            --card-bg: #fbfbfd;
+            --card-radius: 0.9rem;
             --card-pad: 1rem;
             --page-pad: 1rem;
+            --accent: #2176ff;
+            --muted: #6b7280;
         }
+
+        body{
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg,#f6f7fb 0%, #ffffff 60%);
+            color: #111827;
+            margin: 0;
+            padding: 1rem 0 3rem 0;
+        }
+
+        h1{ text-align: center; font-size: 2rem; margin: 0.5rem 0; }
+        p.lead { text-align: center; color: var(--muted); margin-top: 0.25rem; }
 
         .top-nav {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             align-items: center;
-            background: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08);
-            margin: 0.5rem 1rem 1rem 1rem;
+            justify-content: center;
+            background: rgba(255,255,255,0.9);
+            padding: 0.5rem 0.75rem;
+            border-radius: 999px;
+            box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+            margin: 1rem auto;
+            width: min(920px, calc(100% - 2rem));
         }
-        .top-nav a { color: #2176ff; text-decoration:none; font-weight:600 }
+        .top-nav a { color: var(--accent); text-decoration:none; font-weight:600; padding: 0.35rem 0.6rem; border-radius: 0.5rem; }
+        .top-nav a:hover { background: rgba(33,118,255,0.06); }
+
+        main.container { width: min(1200px, calc(100% - 2rem)); margin: 0 auto; }
 
         section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1rem;
-            padding: var(--page-pad);
+            padding: 0.25rem 0;
             align-items: start;
         }
 
@@ -42,60 +60,123 @@
         .visual-card {
             background: var(--card-bg);
             border-radius: var(--card-radius);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+            box-shadow: 0 6px 20px rgba(15,23,42,0.06);
             padding: var(--card-pad);
-            min-height: 120px;
+            min-height: 140px;
             display: block;
+            transition: transform .12s ease, box-shadow .12s ease;
         }
+        .visual-card:hover{ transform: translateY(-6px); box-shadow: 0 12px 30px rgba(15,23,42,0.08); }
 
-        .section-title {
-            margin: 1.25rem 0 0.25rem 0;
-            font-size: 1.25rem;
-        }
+        .card-header{ display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
+        .card-header h3{ margin:0; font-size:1.05rem; }
+        .card-meta { color: var(--muted); font-size: 0.9rem; }
+        .card-link { font-size: 0.85rem; color: var(--accent); text-decoration:none; font-weight:600 }
 
-        .card-small { padding: 0.5rem; }
+        .section-title { margin: 1.25rem 0 0.25rem 0; font-size: 1.25rem; }
+
+        .small-grid { padding: 0.25rem; }
     </style>
 
+    <main class="container">
     <h1>Dashboard</h1>
-    <p>Hint: Try clicking on different things and using your mouse to navigate around the charts!</p>
+    <p class="lead">Interactive previews of the reports — click a title to open the full report.</p>
 
     <nav class="top-nav" aria-label="Main Navigation">
-        <a href="#static-data">Static Data</a>
-        <a href="#dynamic-data">Dynamic Data</a>
-        <a href="/browsers.html" target="_blank" rel="noopener">Full Reports</a>
-        <span style="margin-left:auto;color:#666;font-size:0.95rem;">Quick glance dashboard</span>
+        <a href="/static.html" target="_self" rel="noopener">Static Report</a>
+        <a href="/dynamic.html" target="_self" rel="noopener">Dynamic Report</a>
+        <a href="/browsers.html" target="_self" rel="noopener">Browsers Report</a>
+        <a href="/langs.html" target="_self" rel="noopener">Languages Report</a>
     </nav>
 
-    <h2 id="static-data" class="section-title"><a href="https://annekelley.site/static.html">annekelley.site</a> Static Data Report</h2>
+    <h2 id="static-data" class="section-title">reporting.annekelley.site Static Data Report</h2>
     <section>
         <article id="acceptsCookies" class="visual-card" role="region" aria-labelledby="acceptsCookiesTitle">
-            <h3 id="acceptsCookiesTitle">acceptsCookies</h3>
-            <p>A <em>pie chart</em> displaying the % of users that accept cookies.</p>
+            <div class="card-header">
+                <h3 id="acceptsCookiesTitle">acceptsCookies</h3>
+                <a class="card-link" href="/static.html#acceptsCookies">View report ↗</a>
+            </div>
+            <p class="card-meta">Pie chart showing % of users that accept cookies.</p>
         </article>
         <article id="allowsJavaScript" class="visual-card" role="region" aria-labelledby="allowsJavaScriptTitle">
-            <h3 id="allowsJavaScriptTitle">allowsJavaScript</h3>
-            <p>A <em>pie chart</em> displaying the % of users that allow JavaScript.</p>
+            <div class="card-header">
+                <h3 id="allowsJavaScriptTitle">allowsJavaScript</h3>
+                <a class="card-link" href="/static.html#allowsJavaScript">View report ↗</a>
+            </div>
+            <p class="card-meta">Pie chart showing % of users that allow JavaScript.</p>
         </article>
         <article id="userNetConnType" class="visual-card" role="region" aria-labelledby="userNetConnTypeTitle">
-            <h3 id="userNetConnTypeTitle">userNetConnType</h3>
-            <p>A <em>bar chart</em> displaying the most frequent network connection.</p>
+            <div class="card-header">
+                <h3 id="userNetConnTypeTitle">userNetConnType</h3>
+                <a class="card-link" href="/static.html#userNetConnType">View report ↗</a>
+            </div>
+            <p class="card-meta">Top network connection types (grid).</p>
         </article>
     </section>
-    <h2 id="dynamic-data" class="section-title"><a href="https://annekelley.site/">annekelley.site</a> Dynamic Data Report</h2>
+    <h2 id="dynamic-data" class="section-title">reporting.annekelley.site Dynamic Data Report</h2>
     <section>
-        <article id="pageLoadTimeChart" class="visual-card" role="region" aria-labelledby="pageLoadTimeTotalTitle">
-            <h3 id="pageLoadTimeTotalTitle">pageLoadTimeTotal</h3>
-            <p>A <em>bar plot</em> displaying the quartiles of the total page load time across all pages.</p>
+        <article id="pageLoadTimeTotal" class="visual-card" role="region" aria-labelledby="pageLoadTimeTotalTitle">
+            <div class="card-header">
+                <h3 id="pageLoadTimeTotalTitle">pageLoadTimeTotal</h3>
+                <a class="card-link" href="/dynamic.html#pageLoadTimeTotal">View report ↗</a>
+            </div>
+            <p class="card-meta">Page load time quartiles across pages (grid).</p>
         </article>
         <article id="mouseScatterplotHome" class="visual-card" role="region" aria-labelledby="mouseScatterplotHomeTitle">
-            <h3 id="mouseScatterplotHomeTitle">mouseScatterplot - Home Page</h3>
-            <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks across the homepage.</p>
+            <div class="card-header">
+                <h3 id="mouseScatterplotHomeTitle">mouseScatterplot - Home Page</h3>
+                <a class="card-link" href="/dynamic.html#mouseScatterplotHome">View report ↗</a>
+            </div>
+            <p class="card-meta">Click coordinates on the homepage (scatter).</p>
         </article>
         <article id="mouseScatterplot404" class="visual-card" role="region" aria-labelledby="mouseScatterplot404Title">
-            <h3 id="mouseScatterplot404Title">mouseScatterplot - 404 Page</h3>
-            <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks on the 404 page.</p>
+            <div class="card-header">
+                <h3 id="mouseScatterplot404Title">mouseScatterplot - 404 Page</h3>
+                <a class="card-link" href="/dynamic.html#mouseScatterplot404">View report ↗</a>
+            </div>
+            <p class="card-meta">Click coordinates on the 404 page (scatter).</p>
         </article>
     </section>
+
+    <h2 id="other-reports" class="section-title">Other Reports — Previews</h2>
+    <section>
+        <article id="userAgentBarCard" class="visual-card" role="region" aria-labelledby="userAgentBarTitle">
+            <div class="card-header">
+                <h3 id="userAgentBarTitle">Browser types (preview)</h3>
+                <a class="card-link" href="/browsers.html">Open Browsers Report ↗</a>
+            </div>
+            <p class="card-meta">Stacked bar by platform and browser (preview).</p>
+            <div id="userAgentBar" style="width:100%; height:260px; margin-top:0.75rem;"></div>
+        </article>
+
+        <article id="errorMessageGridCard" class="visual-card" role="region" aria-labelledby="errorMessageGridTitle">
+            <div class="card-header">
+                <h3 id="errorMessageGridTitle">Error messages (preview)</h3>
+                <a class="card-link" href="/browsers.html#errorMessageGrid">Open Errors ↗</a>
+            </div>
+            <p class="card-meta">Top error messages (small grid).</p>
+            <div id="errorMessageGrid" class="small-grid"></div>
+        </article>
+
+        <article id="userLangPieCard" class="visual-card" role="region" aria-labelledby="userLangPieTitle">
+            <div class="card-header">
+                <h3 id="userLangPieTitle">User languages (preview)</h3>
+                <a class="card-link" href="/langs.html">Open Languages Report ↗</a>
+            </div>
+            <p class="card-meta">Language distribution (preview pie).</p>
+            <div id="userLangPie" style="width:100%; height:240px; margin-top:0.75rem;"></div>
+        </article>
+
+        <article id="spanishVisitsGridCard" class="visual-card" role="region" aria-labelledby="spanishVisitsGridTitle">
+            <div class="card-header">
+                <h3 id="spanishVisitsGridTitle">Spanish visits (preview)</h3>
+                <a class="card-link" href="/langs.html#spanishVisitsGrid">Open Spanish Pages ↗</a>
+            </div>
+            <p class="card-meta">Pages visited by Spanish speakers (small grid).</p>
+            <div id="spanishVisitsGrid" class="small-grid"></div>
+        </article>
+    </section>
+    </main>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
         import { getData, countKeyValue, count } from '/fetch.js';
@@ -293,6 +374,54 @@
 
                 zingchart.render({ id: 'mouseScatterplotHome', data: scatterHomeConfig, width: '100%' });
                 zingchart.render({ id: 'mouseScatterplot404', data: scatter404Config, width: '100%' });
+
+                // --- Browsers & Errors previews (small) ---
+                try {
+                    const resp = await fetch('/endpoint.php/reports/browser-types');
+                    const userAgentData = await resp.json();
+                    const browsers = [...new Set(userAgentData.map(r => r.browser))].sort();
+                    const platforms = [...new Set(userAgentData.map(r => r.platform))].sort();
+                    const agg = {};
+                    platforms.forEach(platform => { agg[platform] = {}; browsers.forEach(b => agg[platform][b]=0); });
+                    userAgentData.forEach(row => { agg[row.platform][row.browser] += parseInt(row.count,10); });
+                    const platformColors = { Windows: "#377eb8", Mac: "#4daf4a", iOS: "#e41a1c", Linux: "#984ea3" };
+                    const series = platforms.map(platform => ({ text: platform, backgroundColor: platformColors[platform] || "#999", values: browsers.map(browser => agg[platform][browser] || 0) }));
+                    const barData = { type: 'bar', stacked: true, legend: { align: 'center', verticalAlign: 'bottom' }, scaleX: { labels: browsers }, series };
+                    zingchart.render({ id: 'userAgentBar', data: barData, width: '100%', height: 260 });
+                } catch (err) {
+                    console.error('Browsers preview error:', err);
+                }
+
+                try {
+                    // errors grid preview
+                    const resp2 = await fetch('/endpoint.php/reports/error-messages');
+                    const data2 = await resp2.json();
+                    data2.forEach(row => { row.count = parseInt(row.count, 10); });
+                    // show only top 10
+                    const previewErr = data2.slice(0,10);
+                    createZingGrid('errorMessageGrid', previewErr, [ { index: 'message', header: 'Error Message', type: 'string' }, { index: 'count', header: 'Occurrences', type: 'number' } ], { pageSize: 10, pageOptions: '5,10,20' });
+                } catch (err) { console.error('Error preview grid:', err); }
+
+                // --- Languages previews ---
+                try {
+                    const respL = await fetch('/endpoint.php/reports/user-langs');
+                    const langData = await respL.json();
+                    const pieLabels = langData.map(row => row.language);
+                    const pieValues = langData.map(row => parseInt(row.count, 10));
+                    const userLangColors = ["#27ae60", "#e74c3c", "#f5cba7", "#7f8c8d", "#16a085"];
+                    const userLangPie = {
+                        type: 'navpie', plot: { borderColor: '#fff', borderWidth: 2, valueBox: { placement: 'out', text: '%t (%npv%)' } },
+                        series: pieLabels.map((label,i)=>({ text: label, values:[pieValues[i]], backgroundColor: userLangColors[i % userLangColors.length] }))
+                    };
+                    zingchart.render({ id: 'userLangPie', data: userLangPie, width: '100%', height: 240 });
+                } catch (err) { console.error('User languages preview error:', err); }
+
+                try {
+                    const respS = await fetch('/endpoint.php/reports/spanish-pages');
+                    const sdata = await respS.json();
+                    sdata.forEach(row => { if (row.Visits) row.Visits = parseInt(row.Visits,10); });
+                    createZingGrid('spanishVisitsGrid', sdata.slice(0,10), [ { index: 'FileName', header: 'File Name' }, { index: 'Visits', header: 'Visits', type: 'number' } ], { pageSize: 10, pageOptions: '5,10,20' });
+                } catch (err) { console.error('Spanish visits preview error:', err); }
 
             } catch (err) {
                 console.error('Dashboard initialization error:', err);
