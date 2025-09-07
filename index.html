@@ -111,7 +111,6 @@
         let pageLoadEndConfig = generateHorizontalBoxPlot(await count('pageLoadEnd'));
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
-        let mouseHeatmapConfig = generateHeatMap('mouseHeatmap');
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
 
         /**
@@ -273,6 +272,28 @@
             };
         }
 
+        /**
+         * Generates configuration for a heat map chart.
+         * @param {string} elementID - The ID of the HTML element to bind the heat map to.
+         * @returns {Object} - Configuration object for the heat map.
+         */
+        function generateHeatMap(elementID) {
+            var MAX = 100;
+            var aData = [];
+            zingchart.bind(elementID, 'load', function () {
+                var l, k, v;
+                var iMaxPoints = 512;
+                for (l = 0; l < iMaxPoints; l++) {
+                    k = 5 * Math.round(((iMaxPoints - l) % 300) / 5) + 350;
+                    v = 5 * Math.round((l % 100) / 5) + 250;
+                    aData.push([k, v, MAX]);
+                }
+                zingchart.exec(elementID, 'heatmap.setdata', {
+                    data: aData
+                });
+            });
+        }
+
         try {
             zingchart.render({ id: 'userAgent', data: userAgentConfig, width: '100%' });
             zingchart.render({ id: 'userLang', data: userLangConfig, width: '100%' });
@@ -342,7 +363,7 @@
 
                     // Render chart
                     zingchart.render({
-                        id: 'myChart',
+                        id: 'mouseHeatmap',
                         width: '800px',
                         height: '600px',
                         output: 'canvas',
@@ -351,12 +372,12 @@
                     });
 
                     // Inject heatmap data after render
-                    zingchart.bind('myChart', 'load', function () {
-                        zingchart.exec('myChart', 'colorscale.update', {
+                    zingchart.bind('mouseHeatmap', 'load', function () {
+                        zingchart.exec('mouseHeatmap', 'colorscale.update', {
                             data: { maxValue }
                         });
 
-                        zingchart.exec('myChart', 'heatmap.setdata', {
+                        zingchart.exec('mouseHeatmap', 'heatmap.setdata', {
                             minValue: 0,
                             maxValue,
                             data: heatmapData,
