@@ -113,7 +113,8 @@
             if (keys.length >= 2 && keys.includes("0") && keys.includes("1")) {
                 return {
                     No: counts["0"] || 0,
-                    Yes: counts["1"] || 0
+                    Yes: counts["1"] || 0,
+                    Unknown: counts[""] || 0
                 };
             }
 
