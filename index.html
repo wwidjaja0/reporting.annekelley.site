@@ -289,8 +289,12 @@
                 try {
                     const data = await getData('activity', ['message', 'mouseX', 'mouseY']);
 
+                    console.log(data);
+
                     // keep only click events
                     const clicks = data.filter(item => item.message === 'click');
+
+                    console.log(clicks);
 
                     // transform -> [x, y, weight]
                     const heatmapData = clicks.map(item => [
