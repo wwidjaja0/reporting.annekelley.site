@@ -100,7 +100,7 @@
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
-        let userLangConfig = generateBarConfig(await countKeyValue('userLang').map(([key, value]) => {if (key === '0') key = 'Rejects'; if (key === '1') key = 'Accepts'; return [key, value];}).reduce((obj, [key, value]) => (obj[key] = value, obj), {}));
+        let userLangConfig = generateBarConfig(await countKeyValue('userLang'));
         let acceptsCookiesConfig = generateNavPieConfig(await countKeyValue('acceptsCookies'));
         let allowsJavaScriptConfig = generateNavPieConfig(await countKeyValue('allowsJavaScript'));
         let allowsImagesConfig = generateNavPieConfig(await countKeyValue('allowsImages'));

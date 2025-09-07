@@ -85,15 +85,33 @@ export async function userAgentsToWordCloud() {
  * @param {string} colName - column name to count values for 
  * @returns {Promise<Object>} an object with key-value pairs of unique values and their counts
  * Example: { "es": 3, "en-US": 2 }
+ * Special case: if only values are 0 and null, returns { "No": count0, "Yes": countNull }
  */
 export async function countKeyValue(colName) {
   const data = await getData("static", [colName]);
 
-  return data.reduce((acc, item) => {
-    const index = item[colName];  // <-- dynamic lookup
-    acc[index] = (acc[index] || 0) + 1;
+  // Count normally
+  const counts = data.reduce((acc, item) => {
+    const value = item[colName];
+    acc[value] = (acc[value] || 0) + 1;
     return acc;
   }, {});
+
+  // Check if the only keys are "0" and "null" (null will stringify to "null")
+  const keys = Object.keys(counts);
+
+  if (
+    keys.length <= 2 &&
+    (keys.includes("0") || keys.includes(0)) &&
+    (keys.includes("null") || keys.includes(null))
+  ) {
+    return {
+      No: counts[0] || 0,
+      Yes: counts.null || 0
+    };
+  }
+
+  return counts;
 }
 
 export async function errorsToWordCloud() {
