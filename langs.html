@@ -117,12 +117,12 @@
 
         async function renderChart() {
             try {
-                const resp = await fetch('https://annekelley.site/endpoint.php/reports/user-langs');
+                const resp = await fetch('https://reporting.annekelley.site/endpoint.php/reports/user-langs');
                 const langData = await resp.json();
                 const pieLabels = langData.map(row => row.language);
                 const pieValues = langData.map(row => parseInt(row.count, 10));
                 const userLangColors = ["#27ae60", "#e74c3c", "#f5cba7", "#7f8c8d", "#16a085"];
-                const userLangPie = generatePieConfig(pieLabels, pieValues, 
+                const userLangPie = generatePieConfig(pieLabels, pieValues,
                     {
                         threshold: "15%",
                         others: { text: "Others", backgroundColor: "#2980b9" },
@@ -165,7 +165,7 @@
 
         async function renderGrid() {
             try {
-                const resp = await fetch('https://annekelley.site/endpoint.php/reports/spanish-pages');
+                const resp = await fetch('https://reporting.annekelley.site/endpoint.php/reports/spanish-pages');
                 const data = await resp.json();
                 data.forEach(row => { row.Visits = parseInt(row.Visits, 10); });
                 const columns = [
