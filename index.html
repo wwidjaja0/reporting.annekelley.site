@@ -150,7 +150,7 @@
         </article>
     </section>
 
-    <h2 id="other-reports" class="section-title">Other Reports — Previews</h2>
+    <h2 id="browsers-previews" class="section-title">Browsers Report — Previews</h2>
     <section>
         <article id="userAgentBarCard" class="visual-card" role="region" aria-labelledby="userAgentBarTitle">
             <div class="card-header">
@@ -169,7 +169,10 @@
             <p class="card-meta">Top error messages (small grid).</p>
             <div id="errorMessageGrid" class="small-grid"></div>
         </article>
+    </section>
 
+    <h2 id="langs-previews" class="section-title">Languages Report — Previews</h2>
+    <section>
         <article id="userLangPieCard" class="visual-card" role="region" aria-labelledby="userLangPieTitle">
             <div class="card-header">
                 <h3 id="userLangPieTitle">User languages (preview)</h3>
@@ -243,20 +246,23 @@
 
         // --- Chart/Config generators ---
         function generateBarConfig(keyValuePairs = {}, otherOptions) {
-            return {
-                type: 'bar',
-                plot: { showZero: true },
-                scaleX: { values: Object.keys(keyValuePairs), item: { angle: -45 }, step: 1, 'items-overlap': true },
-                series: [{ values: Object.values(keyValuePairs) }],
-                otherOptions
-            };
+            // if keys include Yes/No use green/red colors
+            const values = Object.values(keyValuePairs);
+            const keys = Object.keys(keyValuePairs);
+            const series = [{ values }];
+            if (keys.includes('Yes') || keys.includes('No')) {
+                series[0].backgroundColor = keys.map(k => k === 'Yes' ? '#16a34a' : (k === 'No' ? '#dc2626' : '#6b7280'));
+            }
+            return { type: 'bar', plot: { showZero: true }, scaleX: { values: keys, item: { angle: -45 }, step: 1, 'items-overlap': true }, series, otherOptions };
         }
 
-        function generateNavPieConfig(keyValuePairs = {}, colors, otherOptions) {
+        function generateNavPieConfig(keyValuePairs = {}, otherOptions) {
+            // color Yes/No specially
+            const palette = { Yes: '#16a34a', No: '#dc2626' };
             return {
                 type: 'navpie',
                 plot: { detach: true, valueBox: { text: '%t\n%npv%' }, tooltip: { text: '%npv%<br>Count: %v' } },
-                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value] })),
+                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value], backgroundColor: palette[key] || undefined })),
                 otherOptions
             };
         }
