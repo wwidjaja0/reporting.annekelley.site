@@ -1,3 +1,4 @@
+
 <!doctype html>
 
 <head>
@@ -74,16 +75,20 @@
 
     <!-- SECTION: Data -->
     <section aria-label="Static Data" class="datacontent">
-        <h2>User Resources Metric</h2>
+        <h2>Data</h2>
         <div class="section-content">
-            Throughout this course, we have discussed the importance of prioritizing user experience. In order to ensure
-            a good time for the user, we must grasp what resources they have so that we can work with them to better the
-            user's experience.
+            We observe that nearly all users allow cookies and JavaScript. These features
+            are required for the reporting site to function, so this is reassuring. Additionally,
+            we collected information about network connection types and load times.
+            However, note that parts of the network data are artificially generated,
+            so they should be interpreted with caution.
         </div>
+        <!-- (Your charts + grids already embedded above) -->
     </section>
 
-    <section aria-label="Report Discussion">
-        <h2>Allowing JavaScript and Cookies Pie Charts</h2>
+    <!-- SECTION: Static indicators (charts + grid) -->
+    <section aria-label="Static Data">
+        <h2>Static indicators</h2>
         <div class="card-row">
             <div class="chart-card small-chart">
                 <h3 id="acceptsCookiesTitle">acceptsCookies</h3>
@@ -94,47 +99,24 @@
                 <div id="allowsJavaScriptPreview" style="width:100%;height:220px"></div>
             </div>
         </div>
-        <div class="section-content">
-            <p>
-                JavaScript empowers us to make the user's time on our site more interactive. If many of our users are
-                lacking it, we need to figure out how to improve our graceeful degradation to still meet user needs.
-                Likewise, cookies are important for us personalizing the user's experience, and if they are widely
-                disallowed, we need to look into why and how to compensate accordingly. Hence, both of these are
-                essential
-                to consider when reporting on user resources.
-            </p>
 
-            <p>We made the following design decisions for the two corresponding data visuals:
-            <ul>
-                <li>Chart type: We chose pie charts, since what matters here is the ratio of users that allow versus
-                    users that disallow.</li>
-                <li>Coloring scheme: We colored the "Yes" slice green, signalling that this corresponds to what we would
-                    hope for, and the "No" slice red, to communicate that the no is the less favorable result.</li>
-            </ul>
-            </p>
-        </div>
-    </section>
-
-    <section aria-label="Static Data">
-        <h2>Network Connectivity Grid</h2>
         <div class="grid-card">
             <h3 id="userNetConnTypeTitle">userNetConnType</h3>
             <div id="netConnTypeGrid"></div>
         </div>
+    </section>
+
+    <section aria-label="Report Discussion">
+        <h2>Discussion</h2>
         <div class="section-content">
-            <p>
-                Network connectivity is another important user resource. Understanding it helps a developer
-                appropriately prioritize critical traffic and implement retries, error correction, and fallback
-                mechanisms.
-            </p>
-            <p>
-                We went with a grid because we wanted to show both the number of users in each of the network
-                connectivity categories as well as each group's average runtime. The numbers enable us understand how
-                impactful our decisions of handling different amounts of connectivity are. The average runtime gives us
-                a sense of how effective our approaches to dealing with network connectivity have been thus far. To show
-                both of these dimensions for each network connectivity group in an easier, uncluttered way, we opted for
-                a grid.
-            </p>
+            Analysis of collected client data shows that the vast majority of users
+            have JavaScript enabled, cookies available, and functional screen/window
+            resolutions. A small fraction of users either block certain features or
+            have missing values. These gaps may indicate restrictive environments
+            (e.g., privacy-focused browsers, extensions, or limited devices).
+            Overall, users appear to possess the resources needed, but edge cases
+            exist where functionality may degrade.
+        </div>
     </section>
 
     <section aria-label="Report Action">
