@@ -108,8 +108,6 @@
                     { index: 'connection', header: 'Connection Type', type: 'string', sortable: true },
                     { index: 'count', header: 'Count', type: 'number', sortable: true }
                 ];
-                // Clear container and append
-                container.innerHTML = '';
                 container.appendChild(grid);
             } catch (err) {
                 console.error('Error rendering network connection grid:', err);
@@ -159,7 +157,6 @@
                     { index: 'metric', header: 'Metric', type: 'string' },
                     { index: 'value', header: 'Value', type: 'number' }
                 ];
-                container.innerHTML = '';
                 container.appendChild(grid);
             } catch (err) {
                 console.error('Error rendering page load time grid:', err);
