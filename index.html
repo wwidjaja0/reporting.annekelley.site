@@ -305,16 +305,17 @@
 
                     console.log(heatmapData);
 
-                    // get max values for scales
-                    const maxX = Math.max(...heatmapData.map(d => d[0]), 0);
-                    const maxY = Math.max(...heatmapData.map(d => d[1]), 0);
+                    // get max values for scales (fallback to 0 if no data)
+                    const maxX = Math.max(...heatmapData.map(d => d[0]).filter(v => !isNaN(v)), 0);
+                    const maxY = Math.max(...heatmapData.map(d => d[1]).filter(v => !isNaN(v)), 0);
 
                     const chartConfig = {
-                        type: 'radar',
+                        type: 'null', // blank base, so we can overlay heatmap freely
                         backgroundColor: '#fff',
+                        plotarea: { margin: 0 },
                         heatmap: {
                             brushType: 'square',
-                            size: 10,
+                            size: 12,
                             blur: 6,
                             tooltip: { text: '%value clicks' }
                         },
@@ -326,14 +327,14 @@
                             alpha: 0.8
                         },
                         scaleX: {
-                            values: `0:${maxX}:100`,
+                            values: `0:${maxX}:${Math.round(maxX / 10) || 1}`,
                             visible: false
                         },
                         scaleY: {
-                            values: `0:${maxY}:100`,
+                            values: `0:${maxY}:${Math.round(maxY / 10) || 1}`,
                             visible: false
                         },
-                        series: [{}] // required placeholder
+                        series: [{}] // placeholder series
                     };
 
                     zingchart.render({
@@ -350,6 +351,7 @@
                             data: heatmapData
                         });
                     });
+
                 } catch (err) {
                     console.error('Heatmap failed:', err);
                 }
