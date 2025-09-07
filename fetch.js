@@ -103,7 +103,7 @@ export async function countKeyValue(colName) {
   if (
     keys.length <= 2 &&
     (keys.includes("0") || keys.includes(0)) &&
-    (keys.includes("null") || keys.includes(null))
+    (keys.includes("1") || keys.includes(1))
   ) {
     return {
       No: counts[0] || 0,
