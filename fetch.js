@@ -82,13 +82,14 @@ export async function userAgentsToWordCloud() {
 }
 
 /**
+ * @param {string} resource - "static", "performance", or "activity"
  * @param {string} colName - column name to count values for 
  * @returns {Promise<Object>} an object with key-value pairs of unique values and their counts
  * Example: { "es": 3, "en-US": 2 }
  * Special case: if only values are 0 and null, returns { "No": count0, "Yes": countNull }
  */
-export async function countKeyValue(colName) {
-  const data = await getData("static", [colName]);
+export async function countKeyValue(resource, colName) {
+  const data = await getData(resource, [colName]);
 
   // Count normally
   const counts = data.reduce((acc, item) => {

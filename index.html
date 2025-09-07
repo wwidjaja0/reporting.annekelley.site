@@ -121,15 +121,15 @@
         }
 
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
-        let userLangConfig = generateBarConfig(await countKeyValue('userLang'));
-        let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('acceptsCookies')));
-        let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsJavaScript')));
-        let allowsImagesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsImages')));
-        let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsCSS')));
-        let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
+        let userLangConfig = generateBarConfig(await countKeyValue('static', 'userLang'));
+        let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'acceptsCookies')));
+        let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsJavaScript')));
+        let allowsImagesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsImages')));
+        let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsCSS')));
+        let userNetConnTypeConfig = generateBarConfig(await countKeyValue('static', 'userNetConnType'));
 
-        let pageLoadStartConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
-        let pageLoadEndConfig = generateHorizontalBoxPlot(await count('pageLoadEnd'));
+        let pageLoadStartConfig = generateBarConfig(await countKeyValue('performance', 'pageLoadStart'));
+        let pageLoadEndConfig = generateBarConfig(await countKeyValue('performance', 'pageLoadEnd'));
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
