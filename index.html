@@ -110,7 +110,7 @@
         function mapYesNo(counts) {
             const keys = Object.keys(counts);
 
-            if (keys.length === 2 && keys.includes("0") && keys.includes("1")) {
+            if (keys.length >= 2 && keys.includes("0") && keys.includes("1")) {
                 return {
                     No: counts["0"] || 0,
                     Yes: counts["1"] || 0
@@ -128,8 +128,8 @@
         let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsCSS')));
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
-        let pageLoadStartConfig = generateBarConfig(await count('pageLoadStart'));
-        let pageLoadEndConfig = generateBarConfig(await count('pageLoadEnd'));
+        let pageLoadStartConfig = generateBarConfig(await countKeyValue('pageLoadStart'));
+        let pageLoadEndConfig = generateBarConfig(await countKeyValue('pageLoadEnd'));
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
