@@ -1,0 +1,90 @@
+<!doctype html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Data Report — annekelley.site</title>
+    <script src="https://annekelley.site/collector.js"></script>
+    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
+    <script src="https://cdn.zingchart.com/zingchart.min.js" defer></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; margin: 1rem 2rem; background: #f9f9f9; color:#222 }
+        h1{ font-size:1.8rem }
+        a { color:#2176ff; text-decoration:none }
+        section { background:#eee;border-radius:1rem;padding:1.5rem;margin-top:1.25rem;max-width:960px;margin-left:auto;margin-right:auto }
+        .grid-card, .chart-card { background:#fff;border-radius:0.75rem;padding:1rem;box-shadow:0 0.5rem 1rem rgba(0,0,0,0.12);margin-top:1rem }
+        .card-row { display:flex;gap:1rem;flex-wrap:wrap }
+        .small-chart { width:320px; }
+    </style>
+</head>
+<body>
+    <h1><a href="/">annekelley.site</a> — Dynamic Data Report</h1>
+    <p><a href="/index.html">Back to Dashboard</a> · <a href="/browsers.html">Browsers Report</a></p>
+
+    <section aria-label="Performance Data">
+        <h2>Page Load Time Summary</h2>
+        <div class="grid-card">
+            <div id="pageLoadTimeGrid"></div>
+        </div>
+    </section>
+
+    <section aria-label="Activity Data">
+        <h2>Mouse Clicks</h2>
+        <div class="card-row">
+            <div class="chart-card small-chart">
+                <h3>Home Page Clicks</h3>
+                <div id="mouseScatterplotHomePreview" style="width:100%;height:300px"></div>
+            </div>
+            <div class="chart-card small-chart">
+                <h3>404 Page Clicks</h3>
+                <div id="mouseScatterplot404Preview" style="width:100%;height:300px"></div>
+            </div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { getData, count } from '/fetch.js';
+        ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
+
+        function computeStats(values = []){
+            const nums = (values||[]).map(Number).filter(v=>!Number.isNaN(v)).sort((a,b)=>a-b);
+            const n = nums.length; if (n===0) return null;
+            const sum = nums.reduce((s,x)=>s+x,0); const mean = sum/n;
+            const median = nums[Math.floor(n/2)]; const Q1 = nums[Math.floor(n/4)]; const Q3 = nums[Math.floor((3*n)/4)];
+            const min = nums[0]; const max = nums[n-1]; const variance = nums.reduce((s,x)=>s+Math.pow(x-mean,2),0)/n; const std = Math.sqrt(variance);
+            return { count:n, min, Q1, median, Q3, max, mean, std };
+        }
+
+        function createGrid(containerId, rows=[], columns=[]){
+            const c = document.getElementById(containerId); if(!c) return;
+            const grid = document.createElement('zing-grid'); grid.setAttribute('page-size','10'); grid.data = rows; grid.columns = columns; c.innerHTML=''; c.appendChild(grid);
+        }
+
+        function generateScatterConfig(clicks){
+            const scatterData = (clicks||[]).map(i=>[parseInt(i.clientX,10)||0, parseInt(i.clientY,10)||0]);
+            const maxX = Math.max(...scatterData.map(d=>d[0]).filter(v=>!isNaN(v)),0); const maxY = Math.max(...scatterData.map(d=>d[1]).filter(v=>!isNaN(v)),0);
+            return {
+                type:'hscatter', plot:{ marker:{ type:'circle', size:4, backgroundColor:'#ff0000' }, tooltip:{ text:'Click at (%kvx, %kvy)' } },
+                scaleX:{ values:`0:${maxX}:${Math.round(maxX/10)||1}`, visible:true }, scaleY:{ values:`0:${maxY}:${Math.round(maxY/10)||1}`, visible:true }, series:[{ values: scatterData }]
+            };
+        }
+
+        async function render(){
+            try{
+                const pageLoadVals = await count('pageLoadTimeTotal');
+                const stats = computeStats(pageLoadVals) || { count:0,min:0,Q1:0,median:0,Q3:0,max:0,mean:0,std:0 };
+                const rows = [ { metric:'Count', value:stats.count }, { metric:'Min (ms)', value:Math.round(stats.min) }, { metric:'Q1 (ms)', value:Math.round(stats.Q1) }, { metric:'Median (ms)', value:Math.round(stats.median) }, { metric:'Q3 (ms)', value:Math.round(stats.Q3) }, { metric:'Max (ms)', value:Math.round(stats.max) }, { metric:'Mean (ms)', value:Math.round(stats.mean) }, { metric:'Std Dev (ms)', value:Math.round(stats.std) }];
+                createGrid('pageLoadTimeGrid', rows, [ { index:'metric', header:'Metric' }, { index:'value', header:'Value', type:'number' }]);
+
+                const activityData = await getData('activity', ['eventType','clientX','clientY','url']);
+                const homeClicks = (activityData||[]).filter(i=>i.eventType==='click' && (i.url==='https://annekelley.site/index.html' || i.url==='https://annekelley.site/'));
+                const page404Clicks = (activityData||[]).filter(i=>i.eventType==='click' && i.url==='https://annekelley.site/404.html');
+                const homeCfg = generateScatterConfig(homeClicks); const p404Cfg = generateScatterConfig(page404Clicks);
+                zingchart.render({ id:'mouseScatterplotHomePreview', data: homeCfg, width:'100%', height:300 });
+                zingchart.render({ id:'mouseScatterplot404Preview', data: p404Cfg, width:'100%', height:300 });
+            }catch(err){ console.error('Dynamic report render error:', err); }
+        }
+
+        render();
+    </script>
+</body>
+</html>
