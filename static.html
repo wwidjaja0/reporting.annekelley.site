@@ -83,8 +83,8 @@
 
                 const columns = [
                     { index: 'connectionType', header: 'Connection Type', type: 'string', sortable: true },
-                    { index: 'count', header: 'Count', type: 'number', sortable: true },
-                    { index: 'avgLoadTimeSec', header: 'Average Load Time (s)', type: 'number', sortable: true, renderer: (val) => val.toFixed(3) }
+                    { index: 'avgLoadTimeSec', header: 'Average Load Time (s)', type: 'number', sortable: true, renderer: (val) => val.toFixed(3) },
+                    { index: 'count', header: 'Count', type: 'number', sortable: true }
                 ];
 
                 const grid = document.createElement('zing-grid');
