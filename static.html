@@ -53,7 +53,8 @@
             return {
                 type: 'navpie',
                 plot: { detach: true, valueBox: { text: '%t\n%npv%' }, tooltip: { text: '%npv%<br>Count: %v' } },
-                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value], backgroundColor: palette[key] || undefined }))
+                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value] })),
+                back: { backgroundColor: palette[key] || undefined }
             };
         }
 
