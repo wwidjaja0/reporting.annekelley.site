@@ -273,28 +273,6 @@
             };
         }
 
-        /**
-         * Generates configuration for a heat map chart.
-         * @param {string} elementID - The ID of the HTML element to bind the heat map to.
-         * @returns {Object} - Configuration object for the heat map.
-         */
-        function generateHeatMap(elementID) {
-            var MAX = 100;
-            var aData = [];
-            zingchart.bind(elementID, 'load', function () {
-                var l, k, v;
-                var iMaxPoints = 512;
-                for (l = 0; l < iMaxPoints; l++) {
-                    k = 5 * Math.round(((iMaxPoints - l) % 300) / 5) + 350;
-                    v = 5 * Math.round((l % 100) / 5) + 250;
-                    aData.push([k, v, MAX]);
-                }
-                zingchart.exec(elementID, 'heatmap.setdata', {
-                    data: aData
-                });
-            });
-        }
-
         try {
             zingchart.render({ id: 'userAgent', data: userAgentConfig, width: '100%' });
             zingchart.render({ id: 'userLang', data: userLangConfig, width: '100%' });
@@ -308,293 +286,98 @@
             zingchart.render({ id: 'pageLoadEnd', data: pageLoadEndConfig, width: '100%' });
             zingchart.render({ id: 'pageLoadTimeTotal', data: pageLoadTimeTotalConfig, width: '100%' });
 
-            var cdata = {
-                type: 'radar',
-                heatmap: {},
-                plotarea: {
-                    margin: 10
-                },
-                scale: {
-                    sizeFactor: 0.9
-                },
-                scaleV: {
-                    offsetStart: 40,
-                    offsetEnd: 0,
-                    values: '0:100:25'
-                },
-                scaleK: {
-                    aspect: 'circle',
-                    values: '0:355:5',
-                    maxItems: 12
-                },
-                tooltip: {},
-                plot: {},
-                series: [{}]
-            };
+            async function renderClickHeatmap() {
+                try {
+                    // Get your activity logs with coordinates
+                    const data = await getData('activity', ['message', 'mouseX', 'mouseY']);
 
-            zingchart.render({
-                id: 'mouseHeatmap',
-                data: cdata,
-                width: '100%',
-                output: 'svg',
-                modules: 'heatmap,color-scale'
-            });
+                    // Filter only click events
+                    const clicks = data.filter(item => item.message === 'click');
+
+                    // Transform into [x, y, weight] format for ZingChart heatmap
+                    // Here each click has weight 1
+                    const heatmapData = clicks.map(item => [
+                        parseInt(item.mouseX, 10),
+                        parseInt(item.mouseY, 10),
+                        1
+                    ]);
+
+                    // Find maximum intensity (just number of clicks at the same spot)
+                    const maxValue = 1; // since each click counts as 1, ZingChart handles scaling
+
+                    // Create chart config
+                    const chartConfig = {
+                        type: 'null',
+                        backgroundColor: '#fff',
+                        flat: true,
+                        heatmap: {
+                            tooltip: {
+                                text: '%value clicks',
+                                decimals: 0
+                            },
+                            alpha: 1,
+                            sortData: true,
+                            brushType: 'square',
+                            size: 10,
+                            blur: 6,
+                        },
+                        colorScale: {
+                            aspect: 'gradient',
+                            gradientStops: '0.0 0.4 0.6 0.7 0.8 1.0',
+                            gradientColors: 'rgba(0,0,255,0) #0000ff #00ffff #bfff00 #ffff00 #ff0000',
+                            backgroundColor: null,
+                            alpha: 0.8,
+                        },
+                        shapes: [
+                            {
+                                type: 'zingchart.rect',
+                                id: 'heatmapContainer',
+                                x: 0,
+                                y: 0,
+                                width: '100%',
+                                height: '100%'
+                            }
+                        ]
+                    };
+
+                    // Render chart
+                    zingchart.render({
+                        id: 'myChart',
+                        width: '800px',
+                        height: '600px',
+                        output: 'canvas',
+                        data: chartConfig,
+                        modules: 'heatmap,color-scale'
+                    });
+
+                    // Inject heatmap data after render
+                    zingchart.bind('myChart', 'load', function () {
+                        zingchart.exec('myChart', 'colorscale.update', {
+                            data: { maxValue }
+                        });
+
+                        zingchart.exec('myChart', 'heatmap.setdata', {
+                            minValue: 0,
+                            maxValue,
+                            data: heatmapData,
+                            size: 12,
+                            blur: 6,
+                        });
+                    });
+
+                } catch (err) {
+                    console.error("Failed to render heatmap:", err);
+                }
+            }
+
+            // Run it
+            renderClickHeatmap();
+
+
             zingchart.render({ id: 'errors', data: errorsConfig, width: '100%' });
         } catch (e) {
             console.error("Error rendering chart:", e);
         }
-
-
-        async function renderCharts() {
-            try {
-                // Dynamic fetch of data
-                const rawStaticData = await getData('static',
-                    ['userScreenWidth', 'userScreenHeight', 'userWindowWidth', 'userWindowHeight']);
-
-                console.log("Fetched static data:", rawStaticData);
-
-                const bar1280Counts2 = {}; // window height counts where window width is 1280
-                const bar500Counts2 = {}; // window height counts where window width is 500
-
-                const bar1280Counts3 = {}; // screen height counts where screen width is 1280
-                const bar1920Counts3 = {}; // screen height counts where screen width is 500
-                const barOtherCounts3 = {}; // screen height counts where screen width is not 1280 or 500
-
-                rawStaticData.forEach(item => {
-                    // 2 series bar chart
-                    // Comparing screen widths in terms of corresponding screen height counts
-                    parseCounts('bar2', [item.userWindowWidth, item.userWindowHeight], [bar1280Counts2, bar500Counts2], ['1280', '500']);
-
-                    // 3 series bar chart
-                    // Comparing 3 groups of user screen width in terms of their screen height
-                    parseCounts('bar3', [item.userScreenWidth, item.userScreenHeight], [bar1280Counts3, bar1920Counts3, barOtherCounts3], ['1280', '1920', 'other']);
-                });
-
-                const barLabels2 = Object.keys(bar1280Counts2); // either 1280 or 500 would work here
-                // Ensure values are arrays and match the order of barLabels2
-                const bar1280Values2 = barLabels2.map(h => bar1280Counts2[h] || 0);
-                const bar500Values2 = barLabels2.map(h => bar500Counts2[h] || 0);
-
-                const barLabels3 = Object.keys(barOtherCounts3); // any of the three would work here
-                // Ensure values are arrays and match the order of barLabels3
-                const bar1280Values3 = barLabels3.map(h => bar1280Counts3[h] || 0);
-                const bar1920Values3 = barLabels3.map(h => bar1920Counts3[h] || 0);
-                const barOtherValues3 = barLabels3.map(h => barOtherCounts3[h] || 0);
-
-                // --- 3-Series Bar Chart ---
-                const screenDimensions3 = generateBar3Config([bar1280Values3, bar1920Values3, barOtherValues3],
-                    "Screen Dimensions", barLabels3, "Count", ["Screen Width: 1280", "Screen Width: 1920", "Screen Width: Other"],
-                    ['pink', 'purple', 'blue'], { alpha: [0.7, 0.7, 0.7] }
-                );
-
-                // -- 2-Series Bar Chart --
-                const windowDimensions2 = generateBar2Config([bar500Values2, bar1280Values2],
-                    "Window Dimensions", barLabels2, "Count", ["Window Width: 500", "Window Width: 1280"],
-                    ["#3366FF", "#00BFFF"], { alpha: [1, 0.7] }
-                );
-
-                // Render
-                zingchart.render({ id: 'userScreenDimensions', data: JSON.stringify(screenDimensions3), height: 1000, width: '100%' });
-                zingchart.render({ id: 'userWindowDimensions', data: JSON.stringify(windowDimensions2), height: 1000, width: '100%' });
-            } catch (err) {
-                console.error("Error rendering charts:", err);
-            }
-        }
-
-        /**
-         * A function to parse raw data from our API and populate any
-         * given count object.
-         * @param {string} chartType - Type of chart ('pie', 'bar2', 'bar3')
-         * @param {any} rawData - Raw data to be parsed
-         * @param {Object} countObj - Object to store counts
-         */
-        function parseCounts(chartType, rawData, countObj, valueChecks = []) {
-            switch (chartType) {
-                case 'bar2':
-
-                    // raw data item will be like this: userWindowWidth = 1280, userWindowHeight = 720
-
-                    try {
-                        // rawData, countObj, and valueChecks are expected to be an array of two elements
-                        const [x, y] = rawData;
-                        const [countObj1, countObj2] = countObj;
-                        const [valCheck1, valCheck2] = valueChecks;
-                        switch (String(x)) {
-                            case String(valCheck1):
-                                countObj1[y] = (countObj1[y] || 0) + 1;
-                                countObj2[y] = countObj2[y] || 0;
-                                break;
-                            case String(valCheck2):
-                                countObj1[y] = countObj1[y] || 0;
-                                countObj2[y] = (countObj2[y] || 0) + 1;
-                                break;
-                            default:
-                                return; // Ignore other values
-                        }
-                    } catch (err) {
-                        console.error("Error parsing 2-series bar chart data:", err);
-                    }
-                    break;
-                case 'bar3':
-                    try {
-                        // rawData, countObj, and valueChecks are expected to be an array of two elements
-                        const [x, y] = rawData;
-                        const [countObj1, countObj2, countObj3] = countObj;
-                        const [valCheck1, valCheck2, valCheck3] = valueChecks;
-                        switch (x) {
-                            case valCheck1:
-                                countObj1[y] = (countObj1[y] || 0) + 1;
-                                countObj2[y] = countObj2[y] || 0;
-                                countObj3[y] = countObj3[y] || 0;
-                                break;
-                            case valCheck2:
-                                countObj1[y] = countObj1[y] || 0;
-                                countObj2[y] = (countObj2[y] || 0) + 1;
-                                countObj3[y] = countObj3[y] || 0;
-                                break;
-                            default:
-                                countObj1[y] = countObj1[y] || 0;
-                                countObj2[y] = countObj2[y] || 0;
-                                countObj3[y] = (countObj3[y] || 0) + 1;
-                                return;
-                        }
-                    } catch (err) {
-                        console.error("Error parsing 3-series bar chart data:", err);
-                    }
-                    break;
-                default:
-                    console.error("Unknown chart type:", chartType);
-            }
-        }
-
-        /**
-         * Generates configuration for a 3-series bar chart.
-         * @param {Array} values - Array of arrays containing values for each series.
-         * @param {string} title - Title of the chart.
-         * @param {Array} x_axis - Labels for the x-axis.
-         * @param {string} y_axis - Label for the y-axis.
-         * @param {Array} legend_labels - Labels for the legend.
-         * @param {Array} colors - Colors for each series.
-         * @param {Object} options - Additional options like alpha values for each series.
-         * @returns {Object} - Configuration object for the 3-series bar chart.
-         */
-        function generateBar3Config(values, title, x_axis, y_axis, legend_labels, colors, options) {
-            return {
-                type: 'bar',
-                title: {
-                    text: title,
-                    backgroundColor: 'none',
-                    fontSize: "22px",
-                    alpha: 0.8,
-                    adjustLayout: true
-                },
-                plotarea: { margin: 'dynamic' },
-                scrollX: {
-
-                },
-                scaleX: {
-                    values: x_axis,
-                    zooming: true,
-                    zoomTo: [0, 50],
-                    item: {
-                        fontSize: 10
-                    },
-                    label: { text: "Screen Height", fontFamily: "Helvetica", bold: true, fontSize: "12px", fontColor: "#7E7E7E" }
-                },
-                scaleY: {
-                    lineColor: '#7E7E7E',
-                    item: { fontColor: '#7e7e7e' },
-                    guide: { visible: true },
-                    label: { text: "Count", fontFamily: "Helvetica", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
-                },
-                legend: {
-                    layout: 'x3',
-                    align: 'center',
-                    adjustLayout: true,
-                    shadow: false,
-                    overflow: 'page',
-                    alpha: 0.05,
-                    marker: { type: 'rectangle', borderColor: 'none', size: 12 },
-                    borderWidth: 0,
-                    maxItems: 3,
-                    toggleAction: 'hide',
-                    pageOn: { backgroundColor: '#000', size: 10, alpha: 0.75 },
-                    pageOff: { backgroundColor: '#7E7E7E', size: 10, alpha: 0.75 },
-                    pageStatus: { color: 'black' }
-                },
-                plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15 },
-                series: legend_labels.map((label, i) => ({
-                    text: label,
-                    values: values[i],
-                    backgroundColor: colors[i],
-                    alpha: options?.alpha[i] || 1
-                }))
-            }
-        }
-
-        /**
-         * Generates configuration for a 2-series bar chart.
-         * @param {Array} values - Array of arrays containing values for each series.
-         * @param {string} title - Title of the chart.
-         * @param {Array} x_axis - Labels for the x-axis.
-         * @param {string} y_axis - Label for the y-axis.
-         * @param {Array} legend_labels - Labels for the legend.
-         * @param {Array} colors - Colors for each series.
-         * @param {Object} options - Additional options like alpha values for each series.
-         * @returns {Object} - Configuration object for the 2-series bar chart.
-         */
-        function generateBar2Config(values, title, x_axis, y_axis, legend_labels, colors, options) {
-            return {
-                type: 'bar',
-                title: {
-                    text: title,
-                    backgroundColor: 'none',
-                    fontFamily: "verdana",
-                    fontColor: "#7E7E7E",
-                    fontSize: "22px",
-                    alpha: 1,
-                    adjustLayout: true
-                },
-                plotarea: { margin: 'dynamic' },
-                legend: {
-                    layout: 'x2',
-                    overflow: 'page',
-                    alpha: 0.05,
-                    shadow: false,
-                    align: 'center',
-                    adjustLayout: true,
-                    marker: { type: 'rectangle', borderColor: 'none', size: 18 },
-                    borderWidth: 0,
-                    maxItems: 3,
-                    toggleAction: 'hide',
-                    pageOn: { backgroundColor: '#000', size: 14, alpha: 1 },
-                    pageOff: { backgroundColor: '#7E7E7E', size: 14, alpha: 1 },
-                    pageStatus: { color: 'black' }
-                },
-                plot: { 'bars-space-left': 0.15, 'bars-space-right': 0.15 },
-                scaleY: {
-                    lineColor: '#7E7E7E',
-                    item: { fontColor: '#7e7e7e' },
-                    guide: { visible: true },
-                    label: { text: y_axis, fontFamily: "verdana", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
-                },
-                scaleX: {
-                    values: x_axis,
-                    placement: 'default',
-                    tick: { size: 10, placement: 'cross' },
-                    itemsOverlap: true,
-                    label: { text: "Window Height", fontFamily: "verdana", bold: true, fontSize: "12px", fontColor: "#7E7E7E" },
-                },
-                series: legend_labels.map((label, i) => ({
-                    text: label,
-                    values: values[i],
-                    backgroundColor: colors[i],
-                    alpha: options?.alpha[i] || 1
-                }))
-            }
-        }
-
-        renderCharts();
 
     </script>
 </body>
