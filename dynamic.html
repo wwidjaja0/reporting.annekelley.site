@@ -15,8 +15,19 @@
         .card-row { display:flex;gap:1rem;flex-wrap:wrap }
         .small-chart { width:320px; }
         /* chart container with background image and overlayed chart */
-        .chart-with-bg { position: relative; background-size: contain; background-repeat: no-repeat; background-position: center; border-radius: 0.5rem; overflow: hidden; }
-        .chart-with-bg .chart-overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .chart-with-bg {
+            position: relative;
+            background-size: 100% auto; /* fit width, keep aspect */
+            background-repeat: no-repeat;
+            background-position: center top;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            padding: 0.5rem;
+        }
+        .chart-with-bg .chart-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
         /* full-bleed container to allow charts to span the viewport width */
         .full-bleed { position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; width: 100vw; box-sizing: border-box; padding: 1rem 2rem; }
         .full-bleed .chart-with-bg { border-radius: 0; }
@@ -42,7 +53,7 @@
         <h2>Mouse Clicks</h2>
         <div class="card-row">
             <div class="full-bleed">
-                <div class="chart-with-bg" style="background-image: url('/annetop.png'); height:520px;">
+                <div id="homeChartWrap" class="chart-with-bg" style="background-image: url('/annetop.png');">
                     <h3 style="margin:0 0.5rem 0.5rem 0; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">Home Page Clicks</h3>
                     <div id="mouseScatterplotHomePreview" class="chart-overlay"></div>
                 </div>
@@ -50,7 +61,7 @@
         </div>
         <div class="card-row" style="margin-top:0.75rem;">
             <div class="full-bleed">
-                <div class="chart-with-bg" style="background-image: url('/annebottom.png'); height:520px;">
+                <div id="p404ChartWrap" class="chart-with-bg" style="background-image: url('/404.png');">
                     <h3 style="margin:0 0.5rem 0.5rem 0; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">404 Page Clicks</h3>
                     <div id="mouseScatterplot404Preview" class="chart-overlay"></div>
                 </div>
@@ -133,25 +144,27 @@
                 const page404Clicks = (activityData||[]).filter(i=>i.eventType==='click' && i.url==='https://annekelley.site/404.html');
                 // scale clicks to image/container size so plots overlay correctly
                 try {
-                    const homeContainer = document.getElementById('mouseScatterplotHomePreview');
-                    const homeParent = homeContainer.parentElement; const homeStyles = getComputedStyle(homeParent);
-                    const homeWidth = Math.floor(homeParent.clientWidth - (parseFloat(homeStyles.paddingLeft||0) + parseFloat(homeStyles.paddingRight||0)));
-                    const homeHeight = Math.floor(homeParent.clientHeight - (parseFloat(homeStyles.paddingTop||0) + parseFloat(homeStyles.paddingBottom||0)));
+                    // Home chart: compute height from image aspect ratio and set wrapper height
+                    const homeParent = document.getElementById('homeChartWrap');
                     const homeImg = '/annetop.png';
                     const homeNatural = await loadImageSize(homeImg);
-                    const homePoints = scaleClicksToContainer(homeClicks, homeNatural, homeWidth, homeHeight);
-                    const homeScaledCfg = generateScatterConfigScaled(homePoints, homeWidth, homeHeight);
-                    zingchart.render({ id:'mouseScatterplotHomePreview', data: homeScaledCfg, width:'100%', height:homeHeight });
+                    const homeWidth = homeParent.clientWidth;
+                    const homeHeightCalc = Math.max(120, Math.round(homeWidth * (homeNatural.height / homeNatural.width)));
+                    homeParent.style.height = homeHeightCalc + 'px';
+                    const homePoints = scaleClicksToContainer(homeClicks, homeNatural, homeWidth, homeHeightCalc);
+                    const homeScaledCfg = generateScatterConfigScaled(homePoints, homeWidth, homeHeightCalc);
+                    zingchart.render({ id:'mouseScatterplotHomePreview', data: homeScaledCfg, width:'100%', height:homeHeightCalc });
 
-                    const p404Container = document.getElementById('mouseScatterplot404Preview');
-                    const p404Parent = p404Container.parentElement; const p404Styles = getComputedStyle(p404Parent);
-                    const p404Width = Math.floor(p404Parent.clientWidth - (parseFloat(p404Styles.paddingLeft||0) + parseFloat(p404Styles.paddingRight||0)));
-                    const p404Height = Math.floor(p404Parent.clientHeight - (parseFloat(p404Styles.paddingTop||0) + parseFloat(p404Styles.paddingBottom||0)));
-                    const p404Img = '/annebottom.png';
+                    // 404 chart: compute height from image aspect ratio and set wrapper height
+                    const p404Parent = document.getElementById('p404ChartWrap');
+                    const p404Img = '/404.png';
                     const p404Natural = await loadImageSize(p404Img);
-                    const p404Points = scaleClicksToContainer(page404Clicks, p404Natural, p404Width, p404Height);
-                    const p404ScaledCfg = generateScatterConfigScaled(p404Points, p404Width, p404Height);
-                    zingchart.render({ id:'mouseScatterplot404Preview', data: p404ScaledCfg, width:'100%', height:p404Height });
+                    const p404Width = p404Parent.clientWidth;
+                    const p404HeightCalc = Math.max(120, Math.round(p404Width * (p404Natural.height / p404Natural.width)));
+                    p404Parent.style.height = p404HeightCalc + 'px';
+                    const p404Points = scaleClicksToContainer(page404Clicks, p404Natural, p404Width, p404HeightCalc);
+                    const p404ScaledCfg = generateScatterConfigScaled(p404Points, p404Width, p404HeightCalc);
+                    zingchart.render({ id:'mouseScatterplot404Preview', data: p404ScaledCfg, width:'100%', height:p404HeightCalc });
                 } catch (err) {
                     // fallback to unscaled render
                     const homeCfg = generateScatterConfig(homeClicks); const p404Cfg = generateScatterConfig(page404Clicks);

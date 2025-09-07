@@ -123,6 +123,7 @@
                 <a class="card-link" href="/static.html#userNetConnType">View report ↗</a>
             </div>
             <p class="card-meta">Top network connection types (grid).</p>
+            <div id="userNetConnTypePreview" class="small-grid" style="margin-top:0.75rem;"></div>
         </article>
     </section>
     <h2 id="dynamic-data" class="section-title">reporting.annekelley.site Dynamic Data Report</h2>
@@ -155,7 +156,7 @@
         <article id="userAgentBarCard" class="visual-card" role="region" aria-labelledby="userAgentBarTitle">
             <div class="card-header">
                 <h3 id="userAgentBarTitle">Browser types (preview)</h3>
-                <a class="card-link" href="/browsers.html">Open Browsers Report ↗</a>
+                <a class="card-link" href="/browsers.html">View Report ↗</a>
             </div>
             <p class="card-meta">Stacked bar by platform and browser (preview).</p>
             <div id="userAgentBar" style="width:100%; height:260px; margin-top:0.75rem;"></div>
@@ -164,7 +165,7 @@
         <article id="errorMessageGridCard" class="visual-card" role="region" aria-labelledby="errorMessageGridTitle">
             <div class="card-header">
                 <h3 id="errorMessageGridTitle">Error messages (preview)</h3>
-                <a class="card-link" href="/browsers.html#errorMessageGrid">Open Errors ↗</a>
+                <a class="card-link" href="/browsers.html#errorMessageGrid">View Report ↗</a>
             </div>
             <p class="card-meta">Top error messages (small grid).</p>
             <div id="errorMessageGrid" class="small-grid"></div>
@@ -176,7 +177,7 @@
         <article id="userLangPieCard" class="visual-card" role="region" aria-labelledby="userLangPieTitle">
             <div class="card-header">
                 <h3 id="userLangPieTitle">User languages (preview)</h3>
-                <a class="card-link" href="/langs.html">Open Languages Report ↗</a>
+                <a class="card-link" href="/langs.html">View Report ↗</a>
             </div>
             <p class="card-meta">Language distribution (preview pie).</p>
             <div id="userLangPie" style="width:100%; height:240px; margin-top:0.75rem;"></div>
@@ -185,7 +186,7 @@
         <article id="spanishVisitsGridCard" class="visual-card" role="region" aria-labelledby="spanishVisitsGridTitle">
             <div class="card-header">
                 <h3 id="spanishVisitsGridTitle">Spanish visits (preview)</h3>
-                <a class="card-link" href="/langs.html#spanishVisitsGrid">Open Spanish Pages ↗</a>
+                <a class="card-link" href="/langs.html#spanishVisitsGrid">View Report ↗</a>
             </div>
             <p class="card-meta">Pages visited by Spanish speakers (small grid).</p>
             <div id="spanishVisitsGrid" class="small-grid"></div>
@@ -303,8 +304,8 @@
                 zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
                 zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
 
-                // userNetConnType as grid
-                renderGridFromKeyValue('userNetConnType', userNetConnTypeKV || {});
+                // userNetConnType as grid (sorted, preview)
+                renderGridFromKeyValue('userNetConnTypePreview', userNetConnTypeKV || {});
 
                 // Activity / scatter plots
                 const activityData = await getData('activity', ['eventType','clientX','clientY','url']);
