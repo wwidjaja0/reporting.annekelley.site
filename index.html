@@ -101,6 +101,7 @@
 
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
         let userLangConfig = generateBarConfig(await countKeyValue('userLang'));
+        console.log(await countKeyValue('acceptsCookies'));
         let acceptsCookiesConfig = generateNavPieConfig(await countKeyValue('acceptsCookies'));
         let allowsJavaScriptConfig = generateNavPieConfig(await countKeyValue('allowsJavaScript'));
         let allowsImagesConfig = generateNavPieConfig(await countKeyValue('allowsImages'));
