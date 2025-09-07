@@ -13,7 +13,7 @@
     <style>
         section {
             display: grid;
-            grid-template-columns: repeat(auto-fit);
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: 1rem;
             padding: 1rem;
         }
@@ -36,8 +36,8 @@
     <h1><a href="https://annekelley.site/">annekelley.site</a> Dashboard</h1>
     <p>Hint: Try clicking on different things and using your mouse to navigate around the charts!</p>
 
+    <h2>Static Data</h2>
     <section>
-        <h2>Static Data</h2>
         <visual-chart id="userAgent">
             <h3>Most Common Browser Clients - userAgent</h3>
             <p>A <em>word cloud</em> displaying the most frequent browser agent received.</p>
@@ -67,8 +67,8 @@
             <p>A <em>bar chart</em> displaying the most frequent network connection.</p>
         </visual-chart>
     </section>
+    <h2>Performance Data</h2>
     <section>
-        <h2>Performance Data</h2>
         <visual-chart id="pageLoadStart">
             <h3>pageLoadStart</h3>
             <p>A <em>bar chart</em> displaying the average start time (ms) on page load. Note: Much of this data has been generated, as realistically, these should all be 0.</p>
@@ -82,8 +82,8 @@
             <p>A <em>bar plot</em> displaying the quartiles of the total page load time across all pages.</p>
         </visual-chart>
     </section>
+    <h2>Activity Data</h2>
     <section>
-        <h2>Activity Data</h2>
         <visual-chart id="mouseScatterplotHome">
             <h3>mouseScatterplot - Home Page</h3>
             <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks across the homepage.</p>
@@ -179,7 +179,7 @@
             }
         }
 
-        /**
+        /**generateBarConfig
          * Generates configuration for a bar chart.
          * @param {JSON} keyValuePairs - Labels paired with values for the bar chart.
          * @param {Object} otherOptions - Additional options for the bar chart.
