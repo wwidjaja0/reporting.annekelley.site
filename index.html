@@ -139,6 +139,7 @@
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
 
         const activityData = await getData('activity', ['eventType', 'clientX', 'clientY', 'url']);
+
         const homePageClicks = data.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/index.html' || item.url === 'https://annekelley.site/');
         const cgiPerlBinClicks = data.filter(item => item.eventType === 'click' && String(item.url).includes('https://annekelley.site/cgi-bin/'));
         const page404Clicks = data.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/404.html');
@@ -314,14 +315,15 @@
          * @param {Object} otherOptions - Additional options for the scatter plot.
          * @returns {Object} - Configuration object for the scatter plot.
          */
-        function generateScatterPlot(dataPoints, otherOptions) {
-            const dataPoints = clicks.map(item => [
+        function generateScatterPlot(clicks, otherOptions) {
+            const scatterData = clicks.map(item => [
                 parseInt(item.clientX, 10),
                 parseInt(item.clientY, 10)
             ]);
 
-            const maxX = Math.max(...dataPoints.map(d => d[0]).filter(v => !isNaN(v)), 0);
-            const maxY = Math.max(...dataPoints.map(d => d[1]).filter(v => !isNaN(v)), 0);
+
+            const maxX = Math.max(...scatterData.map(d => d[0]).filter(v => !isNaN(v)), 0);
+            const maxY = Math.max(...scatterData.map(d => d[1]).filter(v => !isNaN(v)), 0);
 
             return {
                 type: 'hscatter',
@@ -346,7 +348,7 @@
                 },
                 series: [
                     {
-                        values: dataPoints
+                        values: scatterData
                     }
                 ],
                 otherOptions
