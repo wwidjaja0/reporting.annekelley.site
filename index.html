@@ -331,7 +331,7 @@
                     };
 
                     zingchart.render({
-                        id: 'myChart',
+                        id: 'mouseHeatmap',
                         width: 800,
                         height: 600,
                         output: 'canvas',
@@ -339,8 +339,8 @@
                         modules: 'heatmap,color-scale'
                     });
 
-                    zingchart.bind('myChart', 'load', () => {
-                        zingchart.exec('myChart', 'heatmap.setdata', {
+                    zingchart.bind('mouseHeatmap', 'load', () => {
+                        zingchart.exec('mouseHeatmap', 'heatmap.setdata', {
                             data: heatmapData
                         });
                     });
