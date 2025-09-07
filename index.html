@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Visuals</title>
-    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
     <script src="https://cdn.zingchart.com/zingchart.min.js" defer></script>
 </head>
 
@@ -38,14 +37,6 @@
 
     <h2>Static Data</h2>
     <section>
-        <visual-chart id="userAgent">
-            <h3>Most Common Browser Clients - userAgent</h3>
-            <p>A <em>word cloud</em> displaying the most frequent browser agent received.</p>
-        </visual-chart>
-        <visual-chart id="userLang">
-            <h3>Most Common Browser Languages - userLang</h3>
-            <p>A <em>bar chart</em> displaying the most frequent languages.</p>
-        </visual-chart>
         <visual-chart id="acceptsCookies">
             <h3>acceptsCookies</h3>
             <p>A <em>pie chart</em> displaying the % of users that accept cookies.</p>
@@ -54,14 +45,6 @@
             <h3>allowsJavaScript</h3>
             <p>A <em>pie chart</em> displaying the % of users that allow JavaScript.</p>
         </visual-chart>
-        <visual-chart id="allowsImages">
-            <h3>allowsImages</h3>
-            <p>A <em>pie chart</em> displaying the % of users that allow images.</p>
-        </visual-chart>
-        <visual-chart id="allowsCSS">
-            <h3>allowsCSS</h3>
-            <p>A <em>pie chart</em> displaying the % of users that allow CSS.</p>
-        </visual-chart>
         <visual-chart id="userNetConnType">
             <h3>userNetConnType</h3>
             <p>A <em>bar chart</em> displaying the most frequent network connection.</p>
@@ -69,14 +52,6 @@
     </section>
     <h2>Performance Data</h2>
     <section>
-        <visual-chart id="pageLoadStart">
-            <h3>pageLoadStart</h3>
-            <p>A <em>bar chart</em> displaying the average start time (ms) on page load. Note: Much of this data has been generated, as realistically, these should all be 0.</p>
-        </visual-chart>
-        <visual-chart id="pageLoadEnd">
-            <h3>pageLoadEnd</h3>
-            <p>A <em>bar chart</em> displaying the average end time (ms) on page load. Note: Much of this data has been generated.</p>
-        </visual-chart>
         <visual-chart id="pageLoadTimeTotal">
             <h3>pageLoadTimeTotal</h3>
             <p>A <em>bar plot</em> displaying the quartiles of the total page load time across all pages.</p>
@@ -88,17 +63,9 @@
             <h3>mouseScatterplot - Home Page</h3>
             <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks across the homepage.</p>
         </visual-chart>
-        <visual-chart id="mouseScatterplotCGI">
-            <h3>mouseScatterplot - CGI Pages</h3>
-            <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks across all /cgi-bin/ pages on <a href="https://annekelley.site/">https://annekelley.site/</a></p>
-        </visual-chart>
         <visual-chart id="mouseScatterplot404">
             <h3>mouseScatterplot - 404 Page</h3>
             <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks on the 404 page.</p>
-        </visual-chart>
-        <visual-chart id="errors">
-            <h3>errors</h3>
-            <p>A <em>word cloud</em> displaying the most common word that shows up when our errors get logged by the client.</p>
         </visual-chart>
     </section>
     <script type="module">
@@ -120,19 +87,11 @@
             return counts;
         }
 
-        let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
-        let userLangConfig = generateBarConfig(await countKeyValue('static', 'userLang'));
         let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'acceptsCookies')));
         let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsJavaScript')));
-        let allowsImagesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsImages')));
-        let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsCSS')));
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('static', 'userNetConnType'));
 
-        let pageLoadStartConfig = generateBarConfig(await countKeyValue('performance', 'pageLoadStart'));
-        let pageLoadEndConfig = generateBarConfig(await countKeyValue('performance', 'pageLoadEnd'));
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
-
-        let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
 
         const activityData = await getData('activity', ['eventType', 'clientX', 'clientY', 'url']);
 
@@ -143,41 +102,6 @@
         let scatterHomeConfig = generateScatterPlot(homePageClicks);
         let scatterCGIConfig = generateScatterPlot(cgiPerlBinClicks);
         let scatter404Config = generateScatterPlot(page404Clicks);
-        /**
-         * Generates configuration for a word cloud chart.
-         * @param {string} textData - The aggregated text data for the word cloud.
-         * @param {Object} otherOptions - Additional options for the word cloud.
-         * @returns {Object} - Configuration object for the word cloud.
-         */
-        function generateWordCloudConfig(textData = "", otherOptions) {
-            return {
-                type: 'wordcloud',
-                options: {
-                    text: textData,
-                    aspect: 'flow-center',
-                    maxItems: 40,
-                    style: {
-                        hoverState: {
-                            backgroundColor: 'orange',
-                            borderRadius: 2,
-                            fontColor: 'black'
-                        },
-
-                        tooltip: {
-                            text: '%text: %hits',
-                            visible: true,
-                            alpha: 0.8,
-                            backgroundColor: 'black',
-                            borderRadius: 8,
-                            borderColor: 'none',
-                            fontColor: 'yellow',
-                            fontSize: 14,
-                        }
-                    }
-                },
-                otherOptions
-            }
-        }
 
         /**generateBarConfig
          * Generates configuration for a bar chart.
@@ -349,22 +273,14 @@
         }
 
         try {
-            zingchart.render({ id: 'userAgent', data: userAgentConfig, width: '100%' });
-            zingchart.render({ id: 'userLang', data: userLangConfig, width: '100%' });
             zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
             zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
-            zingchart.render({ id: 'allowsImages', data: allowsImagesConfig, width: '100%' });
-            zingchart.render({ id: 'allowsCSS', data: allowsCSSConfig, width: '100%' });
             zingchart.render({ id: 'userNetConnType', data: userNetConnTypeConfig, width: '100%' });
 
-            zingchart.render({ id: 'pageLoadStart', data: pageLoadStartConfig, width: '100%' });
-            zingchart.render({ id: 'pageLoadEnd', data: pageLoadEndConfig, width: '100%' });
             zingchart.render({ id: 'pageLoadTimeTotal', data: pageLoadTimeTotalConfig, width: '100%' });
 
             zingchart.render({ id: 'mouseScatterplotHome', data: scatterHomeConfig, width: '100%' });
-            zingchart.render({ id: 'mouseScatterplotCGI', data: scatterCGIConfig, width: '100%' });
             zingchart.render({ id: 'mouseScatterplot404', data: scatter404Config, width: '100%' });
-            zingchart.render({ id: 'errors', data: errorsConfig, width: '100%' });
         } catch (e) {
             console.error("Error rendering chart:", e);
         }
