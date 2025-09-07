@@ -77,7 +77,11 @@
             grid.setAttribute('page-size', '10');
             grid.setAttribute('page-size-options', '5,10,20');
             grid.setAttribute('sort-on-load', 'true');
-            grid.setAttribute('sort-column', 'value');
+            // choose a sensible default sort column from provided columns (prefer numeric/count-like column)
+            const defaultSortColumn = (Array.isArray(columns) && columns.length > 0)
+                ? (columns.find(c => /count|value|visits|Visits|Count/i.test(String(c.index))) || columns[1] || columns[0]).index
+                : 'value';
+            grid.setAttribute('sort-column', String(defaultSortColumn));
             grid.setAttribute('sort-direction', 'desc');
             grid.data = rows;
             grid.columns = columns;
