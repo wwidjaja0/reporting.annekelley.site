@@ -299,6 +299,8 @@
                         1
                     ]);
 
+                    console.log(heatmapData);
+
                     // get max values for scales
                     const maxX = Math.max(...heatmapData.map(d => d[0]), 0);
                     const maxY = Math.max(...heatmapData.map(d => d[1]), 0);
