@@ -272,28 +272,6 @@
             };
         }
 
-        /**
-         * Generates configuration for a heat map chart.
-         * @param {string} elementID - The ID of the HTML element to bind the heat map to.
-         * @returns {Object} - Configuration object for the heat map.
-         */
-        function generateHeatMap(elementID) {
-            var MAX = 100;
-            var aData = [];
-            zingchart.bind(elementID, 'load', function () {
-                var l, k, v;
-                var iMaxPoints = 512;
-                for (l = 0; l < iMaxPoints; l++) {
-                    k = 5 * Math.round(((iMaxPoints - l) % 300) / 5) + 350;
-                    v = 5 * Math.round((l % 100) / 5) + 250;
-                    aData.push([k, v, MAX]);
-                }
-                zingchart.exec(elementID, 'heatmap.setdata', {
-                    data: aData
-                });
-            });
-        }
-
         try {
             zingchart.render({ id: 'userAgent', data: userAgentConfig, width: '100%' });
             zingchart.render({ id: 'userLang', data: userLangConfig, width: '100%' });
@@ -310,7 +288,7 @@
             async function renderClickHeatmap() {
                 try {
                     // Get your activity logs with coordinates
-                    const data = await getData('activity', ['message', 'mouseX', 'mouseY']);
+                    const data = await getData('activity', ['message', 'clientX', 'clientY']);
 
                     // Filter only click events
                     const clicks = data.filter(item => item.message === 'click');
@@ -318,8 +296,8 @@
                     // Transform into [x, y, weight] format for ZingChart heatmap
                     // Here each click has weight 1
                     const heatmapData = clicks.map(item => [
-                        parseInt(item.mouseX, 10),
-                        parseInt(item.mouseY, 10),
+                        parseInt(item.clientX, 10),
+                        parseInt(item.clientY, 10),
                         1
                     ]);
 
