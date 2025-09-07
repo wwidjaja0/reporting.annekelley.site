@@ -84,8 +84,8 @@
     </section>
     <section>
         <h2>Activity Data</h2>
-        <visual-chart id="mouseHeatmap">
-            <h3>mouseHeatmap</h3>
+        <visual-chart id="mouseScatterplot">
+            <h3>mouseScatterplot</h3>
             <p></p>
         </visual-chart>
         <visual-chart id="errors">
@@ -285,7 +285,7 @@
             zingchart.render({ id: 'pageLoadEnd', data: pageLoadEndConfig, width: '100%' });
             zingchart.render({ id: 'pageLoadTimeTotal', data: pageLoadTimeTotalConfig, width: '100%' });
 
-            async function renderClickHeatmap() {
+            async function renderClickScatterplot() {
                 try {
                     const data = await getData('activity', ['eventType', 'clientX', 'clientY']);
 
@@ -296,68 +296,61 @@
 
                     console.log(clicks);
 
-                    // transform -> [x, y, weight]
-                    const heatmapData = clicks.map(item => [
+                    // transform -> [x, y]
+                    const scatterData = clicks.map(item => [
                         parseInt(item.clientX, 10),
-                        parseInt(item.clientY, 10),
-                        1
+                        parseInt(item.clientY, 10)
                     ]);
 
-                    console.log(heatmapData);
+                    console.log(scatterData);
 
-                    // get max values for scales (fallback to 0 if no data)
-                    const maxX = Math.max(...heatmapData.map(d => d[0]).filter(v => !isNaN(v)), 0);
-                    const maxY = Math.max(...heatmapData.map(d => d[1]).filter(v => !isNaN(v)), 0);
+                    // get max values for scaling
+                    const maxX = Math.max(...scatterData.map(d => d[0]).filter(v => !isNaN(v)), 0);
+                    const maxY = Math.max(...scatterData.map(d => d[1]).filter(v => !isNaN(v)), 0);
 
-                    const chartConfig = {
-                        type: 'null', // blank base, so we can overlay heatmap freely
+                    const scatterConfig = {
+                        type: 'hscatter',
                         backgroundColor: '#fff',
-                        plotarea: { margin: 0 },
-                        heatmap: {
-                            brushType: 'square',
-                            size: 12,
-                            blur: 6,
-                            tooltip: { text: '%value clicks' }
-                        },
-                        colorScale: {
-                            aspect: 'gradient',
-                            gradientStops: '0.0 0.4 0.6 0.8 1.0',
-                            gradientColors:
-                                'rgba(0,0,255,0) #0000ff #00ffff #ffff00 #ff0000',
-                            alpha: 0.8
+                        plot: {
+                            marker: {
+                                type: 'circle',
+                                size: 4,
+                                backgroundColor: '#ff0000'
+                            },
+                            tooltip: {
+                                text: 'Click at (%kvx, %kvy)'
+                            }
                         },
                         scaleX: {
                             values: `0:${maxX}:${Math.round(maxX / 10) || 1}`,
-                            visible: false
+                            visible: true
                         },
                         scaleY: {
                             values: `0:${maxY}:${Math.round(maxY / 10) || 1}`,
-                            visible: false
+                            visible: true
                         },
-                        series: [{}] // placeholder series
+                        series: [
+                            {
+                                values: scatterData
+                            }
+                        ]
                     };
 
                     zingchart.render({
-                        id: 'mouseHeatmap',
+                        id: 'mouseScatter',
+                        data: scatterConfig,
                         width: 800,
                         height: 600,
-                        output: 'canvas',
-                        data: chartConfig,
-                        modules: 'heatmap,color-scale'
+                        output: 'canvas'
                     });
 
-                    zingchart.bind('mouseHeatmap', 'load', () => {
-                        zingchart.exec('mouseHeatmap', 'heatmap.setdata', {
-                            data: heatmapData
-                        });
-                    });
 
                 } catch (err) {
-                    console.error('Heatmap failed:', err);
+                    console.error('Scatterplot failed:', err);
                 }
             }
 
-            renderClickHeatmap();
+            renderClickScatterplot();
 
             zingchart.render({ id: 'errors', data: errorsConfig, width: '100%' });
         } catch (e) {
