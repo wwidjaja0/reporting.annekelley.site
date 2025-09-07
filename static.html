@@ -49,12 +49,24 @@
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
         function generateNavPieConfig(keyValuePairs = {}) {
-            const palette = { Yes: '#16a34a', No: '#dc2626' };
+            // map common Yes/No variants to colors
+            const yesColor = '#16a34a';
+            const noColor = '#dc2626';
+            function colorForKey(k){
+                const s = String(k).trim().toLowerCase();
+                if (s === 'yes' || s === '1' || s === 'true') return yesColor;
+                if (s === 'no' || s === '0' || s === 'false') return noColor;
+                return undefined;
+            }
             return {
                 type: 'navpie',
                 plot: { detach: true, valueBox: { text: '%t\n%npv%' }, tooltip: { text: '%npv%<br>Count: %v' } },
-                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value] })),
-                back: { backgroundColor: palette[key] || undefined }
+                series: Object.entries(keyValuePairs).map(([key, value]) => {
+                    const c = colorForKey(key);
+                    const item = { text: key, values: [value] };
+                    if (c) { item['background-color'] = c; item.backgroundColor = c; }
+                    return item;
+                })
             };
         }
 
