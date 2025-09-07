@@ -128,8 +128,8 @@
         let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsCSS')));
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
-        let pageLoadStartConfig = generateBarConfig(await count('pageLoadStart'));
-        let pageLoadEndConfig = generateBarConfig(await count('pageLoadEnd'));
+        let pageLoadStartConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
+        let pageLoadEndConfig = generateHorizontalBoxPlot(await count('pageLoadEnd'));
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
