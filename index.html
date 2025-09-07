@@ -71,38 +71,34 @@
         <h2>Performance Data</h2>
         <visual-chart id="pageLoadStart">
             <h3>pageLoadStart</h3>
-            <p></p>
+            <p>A <em>bar chart</em> displaying the average start time (ms) on page load. Note: Much of this data has been generated, as realistically, these should all be 0.</p>
         </visual-chart>
         <visual-chart id="pageLoadEnd">
             <h3>pageLoadEnd</h3>
-            <p></p>
+            <p>A <em>bar chart</em> displaying the average end time (ms) on page load. Note: Much of this data has been generated.</p>
         </visual-chart>
         <visual-chart id="pageLoadTimeTotal">
             <h3>pageLoadTimeTotal</h3>
-            <p></p>
+            <p>A <em>bar plot</em> displaying the quartiles of the total page load time across all pages.</p>
         </visual-chart>
     </section>
     <section>
         <h2>Activity Data</h2>
         <visual-chart id="mouseScatterplotHome">
             <h3>mouseScatterplot - Home Page</h3>
-            <p></p>
+            <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks across the homepage.</p>
         </visual-chart>
         <visual-chart id="mouseScatterplotCGI">
             <h3>mouseScatterplot - CGI Pages</h3>
-            <p></p>
+            <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks across all /cgi-bin/ pages on <a href="https://annekelley.site/">https://annekelley.site/</a></p>
         </visual-chart>
         <visual-chart id="mouseScatterplot404">
             <h3>mouseScatterplot - 404 Page</h3>
-            <p></p>
-        </visual-chart>
-        <visual-chart id="mouseScatterplotNull">
-            <h3>mouseScatterplot - Null URL Values</h3>
-            <p></p>
+            <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks on the 404 page.</p>
         </visual-chart>
         <visual-chart id="errors">
             <h3>errors</h3>
-            <p></p>
+            <p>A <em>word cloud</em> displaying the most common word that shows up when our errors get logged by the client.</p>
         </visual-chart>
     </section>
     <script type="module">
@@ -132,8 +128,8 @@
         let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsCSS')));
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
-        let pageLoadStartConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
-        let pageLoadEndConfig = generateHorizontalBoxPlot(await count('pageLoadEnd'));
+        let pageLoadStartConfig = generateBarConfig(await count('pageLoadStart'));
+        let pageLoadEndConfig = generateBarConfig(await count('pageLoadEnd'));
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
@@ -143,13 +139,10 @@
         const homePageClicks = activityData.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/index.html' || item.url === 'https://annekelley.site/');
         const cgiPerlBinClicks = activityData.filter(item => item.eventType === 'click' && String(item.url).includes('https://annekelley.site/cgi-bin/'));
         const page404Clicks = activityData.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/404.html');
-        const clicksFromMissingURL = activityData.filter(item => item.eventType === 'click' && !item.url);
 
         let scatterHomeConfig = generateScatterPlot(homePageClicks);
         let scatterCGIConfig = generateScatterPlot(cgiPerlBinClicks);
         let scatter404Config = generateScatterPlot(page404Clicks);
-        let scatterNullConfig = generateScatterPlot(clicksFromMissingURL);
-
         /**
          * Generates configuration for a word cloud chart.
          * @param {string} textData - The aggregated text data for the word cloud.
@@ -371,7 +364,6 @@
             zingchart.render({ id: 'mouseScatterplotHome', data: scatterHomeConfig, width: '100%' });
             zingchart.render({ id: 'mouseScatterplotCGI', data: scatterCGIConfig, width: '100%' });
             zingchart.render({ id: 'mouseScatterplot404', data: scatter404Config, width: '100%' });
-            zingchart.render({ id: 'mouseScatterplotNull', data: scatterNullConfig, width: '100%' });
             zingchart.render({ id: 'errors', data: errorsConfig, width: '100%' });
         } catch (e) {
             console.error("Error rendering chart:", e);
