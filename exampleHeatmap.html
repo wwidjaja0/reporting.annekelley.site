@@ -72,6 +72,7 @@
         v = 5 * Math.round((l % 100) / 5);
         aData.push([k, v, MAX]);
       }
+      console.log(aData);
       zingchart.exec('zc', 'heatmap.setdata', {
         data: aData
       });
