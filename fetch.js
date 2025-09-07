@@ -91,29 +91,11 @@ export async function userAgentsToWordCloud() {
 export async function countKeyValue(resource, colName) {
   const data = await getData(resource, [colName]);
 
-  // Count normally
-  const counts = data.reduce((acc, item) => {
-    const value = item[colName];
-    acc[value] = (acc[value] || 0) + 1;
+  return data.reduce((acc, item) => {
+    const index = item[colName];  // <-- dynamic lookup
+    acc[index] = (acc[index] || 0) + 1;
     return acc;
   }, {});
-
-  // Check if the only keys are "0" and "null" (null will stringify to "null")
-  const keys = Object.keys(counts);
-
-  if (
-    keys.length <= 2 &&
-    (keys.includes("0") || keys.includes(0)) &&
-    (keys.includes("1") || keys.includes(1))
-  ) {
-    return {
-      No: counts[0] || 0,
-      Yes: counts.null || 0
-    };
-  }
-
-  console.log(`Counts for ${colName}:`, counts);
-  return counts;
 }
 
 export async function errorsToWordCloud() {
