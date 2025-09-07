@@ -85,6 +85,20 @@
             container.appendChild(grid);
         }
 
+        // normalize keys like '0','1', 0,1, 'true','false' into 'Yes'/'No' labels and sum counts
+        function normalizeYesNoKV(kv = {}){
+            const out = {};
+            Object.entries(kv || {}).forEach(([k,v]) => {
+                const s = String(k).trim().toLowerCase();
+                let label = k;
+                if (s === '1' || s === 'true' || s === 'yes') label = 'Yes';
+                else if (s === '0' || s === 'false' || s === 'no') label = 'No';
+                const num = Number(v) || 0;
+                out[label] = (out[label] || 0) + num;
+            });
+            return out;
+        }
+
         async function render() {
             try {
                 const [acceptsCookiesKV, allowsJavaScriptKV, userNetConnTypeKV] = await Promise.all([
@@ -93,9 +107,9 @@
                     countKeyValue('static','userNetConnType')
                 ]);
 
-                // Pie charts
-                const acceptsCfg = generateNavPieConfig(acceptsCookiesKV || {});
-                const allowsCfg = generateNavPieConfig(allowsJavaScriptKV || {});
+                // Pie charts (normalize 0/1 -> Yes/No so labels and colors apply)
+                const acceptsCfg = generateNavPieConfig(normalizeYesNoKV(acceptsCookiesKV || {}));
+                const allowsCfg = generateNavPieConfig(normalizeYesNoKV(allowsJavaScriptKV || {}));
                 zingchart.render({ id: 'acceptsCookiesPreview', data: acceptsCfg, width: '100%', height: 220 });
                 zingchart.render({ id: 'allowsJavaScriptPreview', data: allowsCfg, width: '100%', height: 220 });
 
