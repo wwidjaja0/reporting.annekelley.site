@@ -83,7 +83,7 @@
     </section>
     <h2 id="dynamic-data" class="section-title"><a href="https://annekelley.site/">annekelley.site</a> Dynamic Data Report</h2>
     <section>
-        <article id="pageLoadTimeTotal" class="visual-card" role="region" aria-labelledby="pageLoadTimeTotalTitle">
+        <article id="pageLoadTimeChart" class="visual-card" role="region" aria-labelledby="pageLoadTimeTotalTitle">
             <h3 id="pageLoadTimeTotalTitle">pageLoadTimeTotal</h3>
             <p>A <em>bar plot</em> displaying the quartiles of the total page load time across all pages.</p>
         </article>
@@ -98,7 +98,7 @@
     </section>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
-        import { getData, userAgentsToWordCloud, countKeyValue, errorsToWordCloud, count } from '/fetch.js';
+        import { getData, countKeyValue, count } from '/fetch.js';
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
@@ -159,7 +159,7 @@
             };
         }
 
-        function generateNavPieConfig(keyValuePairs = {}, otherOptions) {
+        function generateNavPieConfig(keyValuePairs = {}, colors, otherOptions) {
             return {
                 type: 'navpie',
                 plot: { detach: true, valueBox: { text: '%t\n%npv%' }, tooltip: { text: '%npv%<br>Count: %v' } },
@@ -187,20 +187,77 @@
             createZingGrid(containerId, rows, [ { index: 'key', header: 'Key', type: 'string' }, { index: 'value', header: 'Count', type: 'number' } ], { pageSize: 10, pageOptions: '5,10,20', sortOnLoad: true, sortColumn: 'value', sortDirection: 'desc' });
         }
 
-        function renderPageLoadStatsGrid(containerId, values){
-            const stats = computeStats(values) || { count: 0, min:0, Q1:0, median:0, Q3:0, max:0, mean:0, std:0 };
-            const rows = [
-                { metric: 'Count', value: stats.count },
-                { metric: 'Min (ms)', value: Math.round(stats.min) },
-                { metric: 'Q1 (ms)', value: Math.round(stats.Q1) },
-                { metric: 'Median (ms)', value: Math.round(stats.median) },
-                { metric: 'Q3 (ms)', value: Math.round(stats.Q3) },
-                { metric: 'Max (ms)', value: Math.round(stats.max) },
-                { metric: 'Mean (ms)', value: Math.round(stats.mean) },
-                { metric: 'Std Dev (ms)', value: Math.round(stats.std) }
-            ];
-            createZingGrid(containerId, rows, [ { index: 'metric', header: 'Metric', type: 'string' }, { index: 'value', header: 'Value', type: 'number' } ], { pageSize: 10, pageOptions: '5,10' });
+        async function renderPageLoadBarChart() {
+            try {
+                const resp = await fetch('/endpoint.php/reports/total-page-load-times');
+                const data = await resp.json();
+
+                // Extracts labels and values
+                const labels = data.map(row => row.filename);
+                const values = data.map(row => parseFloat(row.avgLoadTime));
+
+                const chartConfig = {
+                    type: 'bar',
+                    title: {
+                        text: 'Average Total Page Load Time by Page (seconds)',
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                    },
+                    scaleX: {
+                        labels: labels,
+                        label: { text: 'Page' },
+                        item: { angle: -45, fontSize: 11, wrapText: true, maxWidth: 100 },
+                    },
+                    scaleY: {
+                        label: { text: 'Load Time (seconds)' },
+                        minValue: 0,
+                        guide: { visible: true },
+                        tick: {
+                            step: 0.2,
+                        },
+                        markers: [
+                            {
+                                type: 'line',
+                                range: [1, 1],
+                                lineColor: 'red',
+                                lineWidth: 2,
+                                label: { text: 'Acceptable Threshold (1s)', color: 'red', bold: true, offsetY: -10 },
+                                placement: 'back'
+                            }
+                        ]
+                    },
+                    plot: {
+                        barWidth: '70%',
+                        borderRadiusTopLeft: 3,
+                        borderRadiusTopRight: 3,
+                    },
+                    series: [
+                        {
+                            values: values,
+                            backgroundColor: '#377eb8'
+                        }
+                    ],
+                    legend: {
+                        visible: false
+                    },
+                    tooltip: {
+                        text: '%t<br>Load Time: %v seconds',
+                        fontSize: 14,
+                    },
+                    padding: '15 15 20 60'
+                };
+
+                zingchart.render({
+                    id: 'pageLoadTimeChart',
+                    data: chartConfig,
+                    height: 450,
+                    width: '100%'
+                });
+            } catch (error) {
+                console.error('Error rendering page load time chart:', error);
+            }
         }
+
 
         // --- Initialization ---
         async function init(){
@@ -211,9 +268,9 @@
                     countKeyValue('static','allowsJavaScript'),
                     countKeyValue('static','userNetConnType')
                 ]);
-
-                const acceptsCookiesConfig = generateNavPieConfig(mapYesNo(acceptsCookiesKV || {}));
-                const allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(allowsJavaScriptKV || {}));
+                const colors = ['#CC0000', '#009900'];
+                const acceptsCookiesConfig = generateNavPieConfig(mapYesNo(acceptsCookiesKV || {}), colors);
+                const allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(allowsJavaScriptKV || {}), colors);
 
                 zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
                 zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
@@ -222,8 +279,7 @@
                 renderGridFromKeyValue('userNetConnType', userNetConnTypeKV || {});
 
                 // Page load times
-                const pageLoadTimeValues = await count('pageLoadTimeTotal');
-                renderPageLoadStatsGrid('pageLoadTimeTotal', pageLoadTimeValues || []);
+                renderPageLoadBarChart();
 
                 // Activity / scatter plots
                 const activityData = await getData('activity', ['eventType','clientX','clientY','url']);

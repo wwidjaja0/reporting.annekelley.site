@@ -187,12 +187,6 @@ class AnalyticsModel {
         return $stmt->execute();
     }
 
-    // Analytics/reporting queries for ZingChart:
-    public function avgTimeToServeByFile() {
-        $q = "SELECT filename, AVG(timeToServeMS) AS avgTime FROM apacheLogs GROUP BY filename";
-        $result = $this->conn->query($q);
-        return $result->fetch_all(MYSQLI_ASSOC);
-    }
     public function sessionCountByWidth() {
         $q = "SELECT userScreenWidth AS width, COUNT(DISTINCT id) AS sessions FROM static GROUP BY width";
         $result = $this->conn->query($q);
@@ -330,6 +324,23 @@ class AnalyticsModel {
         }
         return $result->fetch_all(MYSQLI_ASSOC);
     } 
+
+    public function totalPageLoadTimesByPage() {
+        // Queries total load time average by filename from performance table
+        $stmt = "
+            SELECT filename, AVG(pageLoadTimeTotal) AS avgLoadTime
+            FROM performance
+            GROUP BY filename
+            ORDER BY avgLoadTime DESC
+            LIMIT 50
+        ";
+        $result = $this->conn->query($stmt);
+        if (!$result) {
+            return ["error" => "Query failed: " . $this->conn->error];
+        }
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
 
 
     // Retrieves requested columns from table

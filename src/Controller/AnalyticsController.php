@@ -54,8 +54,8 @@ class AnalyticsController {
                 case 'error-messages':
                     $data = $this->model->countErrorMessages();
                     break;
-                case 'avg-file-serve':
-                    $data = $this->model->avgTimeToServeByFile();
+                case 'total-page-load-times':
+                    $data = $this->model->totalPageLoadTimesByPage();
                     break;
                 case 'session-by-width':
                     $data = $this->model->sessionCountByWidth();
