@@ -301,12 +301,12 @@
 
             async function renderClickScatterplot() {
                 try {
-                    const data = await getData('activity', ['eventType', 'clientX', 'clientY']);
+                    const data = await getData('activity', ['eventType', 'clientX', 'clientY', 'url']);
 
                     console.log(data);
 
                     // keep only click events
-                    const clicks = data.filter(item => item.eventType === 'click');
+                    const clicks = data.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/');
 
                     console.log(clicks);
 
