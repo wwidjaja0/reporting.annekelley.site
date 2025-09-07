@@ -99,13 +99,26 @@
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
+        function mapYesNo(counts) {
+            const keys = Object.keys(counts);
+
+            if (keys.length === 2 && keys.includes("0") && keys.includes("1")) {
+                return {
+                    No: counts["0"] || 0,
+                    Yes: counts["1"] || 0
+                };
+            }
+
+            return counts;
+        }
+
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
         let userLangConfig = generateBarConfig(await countKeyValue('userLang'));
-        console.log(await countKeyValue('acceptsCookies'));
-        let acceptsCookiesConfig = generateNavPieConfig(await countKeyValue('acceptsCookies'));
-        let allowsJavaScriptConfig = generateNavPieConfig(await countKeyValue('allowsJavaScript'));
-        let allowsImagesConfig = generateNavPieConfig(await countKeyValue('allowsImages'));
-        let allowsCSSConfig = generateNavPieConfig(await countKeyValue('allowsCSS'));
+        console.log(mapYesNo(await countKeyValue('acceptsCookies')));
+        let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('acceptsCookies')));
+        let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsJavaScript')));
+        let allowsImagesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsImages')));
+        let allowsCSSConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsCSS')));
         let userNetConnTypeConfig = generateBarConfig(await countKeyValue('userNetConnType'));
 
         let pageLoadStartConfig = generateHorizontalBoxPlot(await count('pageLoadStart'));
