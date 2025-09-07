@@ -159,8 +159,9 @@
                 zingchart.render({ id: 'acceptsCookiesPreview', data: acceptsCfg, width: '100%', height: 220 });
                 zingchart.render({ id: 'allowsJavaScriptPreview', data: allowsCfg, width: '100%', height: 220 });
 
-                // Grid
-                const rows = Object.entries(userNetConnTypeKV || {}).map(([k,v]) => ({ connection: k, count: Number(v) }));
+                // Grid: build rows and pre-sort by count (desc) so grid shows greatest-to-least
+                let rows = Object.entries(userNetConnTypeKV || {}).map(([k,v]) => ({ connection: k, count: Number(v) }));
+                rows = rows.sort((a,b) => (Number(b.count) || 0) - (Number(a.count) || 0));
                 createGrid('userNetConnTypeGrid', rows, [ { index: 'connection', header: 'Connection Type' }, { index: 'count', header: 'Count', type: 'number' }]);
             } catch (err) {
                 console.error('Static report render error:', err);
