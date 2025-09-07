@@ -87,6 +87,19 @@
             grid.columns = columns;
             container.innerHTML = '';
             container.appendChild(grid);
+            // try to force a sort after the grid initializes (API may be available)
+            try {
+                // small delay to allow ZingGrid to initialize
+                const _col = defaultSortColumn;
+                setTimeout(() => {
+                    if (typeof grid.sort === 'function') {
+                        grid.sort(_col, 'desc');
+                    } else if (grid.setAttribute) {
+                        grid.setAttribute('sort-column', String(_col));
+                        grid.setAttribute('sort-direction', 'desc');
+                    }
+                }, 50);
+            } catch (e) { /* ignore */ }
         }
 
         // normalize keys like '0','1', 0,1, 'true','false' into 'Yes'/'No' labels and sum counts
