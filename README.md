@@ -11,7 +11,18 @@ As firm believers in progressive enhancement, we rely on log files first and use
 ## Dashboard
 We offer an explanation of all our design decisions, including the chart types representing our data, the metrics we worked with, and so on. 
 
-### Page Load Time Bar Chart
+### User Resources Metric
+Throughout this course, we have discussed the importance of prioritizing user experience. In order to ensure a good time for the user, we must grasp what resources they have so that we can work with them to better the user's experience.
+
+### Allowing JavaScript and Cookies Pie Charts
+JavaScript empowers us to make the user's time on our site more interactive. If many of our users are lacking it, we need to figure out how to improve our graceeful degradation to still meet user needs. Likewise, cookies are important for us personalizing the user's experience, and if they are widely disallowed, we need to look into why and how to compensate accordingly. Hence, both of these are essential to consider when reporting on user resources.
+
+We made the following design decisions for the two corresponding data visuals:
+ - Chart type: We chose pie charts, since what matters here is the ratio of users that allow versus users that disallow.
+ - Coloring scheme: We colored the "Yes" slice green, signalling that this corresponds to what we would hope for, and the "No" slice red, to communicate that the no is the less favorable result. 
+
+### Network Connectivity Grid
+Network connectivity is another important user resource. Understanding it helps a developer appropriately prioritize critical traffic and implement retries, error correction, and fallback mechanisms.
 
  
 

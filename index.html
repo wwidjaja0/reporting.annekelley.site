@@ -280,77 +280,6 @@
             createZingGrid(containerId, rows, [ { index: 'key', header: 'Key', type: 'string' }, { index: 'value', header: 'Count', type: 'number' } ], { pageSize: 10, pageOptions: '5,10,20', sortOnLoad: true, sortColumn: 'value', sortDirection: 'desc' });
         }
 
-        async function renderPageLoadBarChart() {
-            try {
-                const resp = await fetch('/endpoint.php/reports/total-page-load-times');
-                const data = await resp.json();
-
-                // Extracts labels and values
-                const labels = data.map(row => row.filename);
-                const values = data.map(row => parseFloat(row.avgLoadTime));
-
-                const chartConfig = {
-                    type: 'bar',
-                    title: {
-                        text: 'Average Total Page Load Time by Page (seconds)',
-                        fontSize: 18,
-                        fontWeight: 'bold',
-                    },
-                    scaleX: {
-                        labels: labels,
-                        label: { text: 'Page' },
-                        item: { angle: -45, fontSize: 11, wrapText: true, maxWidth: 100 },
-                    },
-                    scaleY: {
-                        label: { text: 'Load Time (seconds)' },
-                        minValue: 0,
-                        guide: { visible: true },
-                        tick: {
-                            step: 0.2,
-                        },
-                        markers: [
-                            {
-                                type: 'line',
-                                range: [1, 1],
-                                lineColor: 'red',
-                                lineWidth: 2,
-                                label: { text: 'Acceptable Threshold (1s)', color: 'red', bold: true, offsetY: -10 },
-                                placement: 'back'
-                            }
-                        ]
-                    },
-                    plot: {
-                        barWidth: '70%',
-                        borderRadiusTopLeft: 3,
-                        borderRadiusTopRight: 3,
-                    },
-                    series: [
-                        {
-                            values: values,
-                            backgroundColor: '#377eb8'
-                        }
-                    ],
-                    legend: {
-                        visible: false
-                    },
-                    tooltip: {
-                        text: '%t<br>Load Time: %v seconds',
-                        fontSize: 14,
-                    },
-                    padding: '15 15 20 60'
-                };
-
-                zingchart.render({
-                    id: 'pageLoadTimeChart',
-                    data: chartConfig,
-                    height: 450,
-                    width: '100%'
-                });
-            } catch (error) {
-                console.error('Error rendering page load time chart:', error);
-            }
-        }
-
 
         // --- Initialization ---
         async function init(){
@@ -370,9 +299,6 @@
 
                 // userNetConnType as grid
                 renderGridFromKeyValue('userNetConnType', userNetConnTypeKV || {});
-
-                // Page load times
-                renderPageLoadBarChart();
 
                 // Activity / scatter plots
                 const activityData = await getData('activity', ['eventType','clientX','clientY','url']);

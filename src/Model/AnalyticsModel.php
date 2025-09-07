@@ -325,14 +325,16 @@ class AnalyticsModel {
         return $result->fetch_all(MYSQLI_ASSOC);
     } 
 
-    public function totalPageLoadTimesByPage() {
-        // Queries total load time average by filename from performance table
+    public function avgLoadTimeByConnectionType() {
+        // Joins performance with static on id to get connection type and pageLoadTimeTotal
         $stmt = "
-            SELECT filename, AVG(pageLoadTimeTotal) AS avgLoadTime
-            FROM performance
-            GROUP BY filename
-            ORDER BY avgLoadTime DESC
-            LIMIT 50
+            SELECT s.userNetConnType AS connectionType,
+                COUNT(*) AS count,
+                ROUND(AVG(p.pageLoadTimeTotal), 3) AS avgLoadTimeSec
+            FROM static s
+            INNER JOIN performance p ON s.id = p.id
+            GROUP BY s.userNetConnType
+            ORDER BY count DESC
         ";
         $result = $this->conn->query($stmt);
         if (!$result) {

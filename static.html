@@ -40,7 +40,7 @@
 
         <div class="grid-card">
             <h3 id="userNetConnTypeTitle">userNetConnType</h3>
-            <div id="userNetConnTypeGrid"></div>
+            <div id="netConnTypeGrid"></div>
         </div>
     </section>
 
@@ -56,27 +56,43 @@
             };
         }
 
-        function createGrid(containerId, rows = [], columns = []){
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            const grid = document.createElement('zing-grid');
-            grid.setAttribute('page-size', '10');
-            grid.setAttribute('page-size-options', '5,10,20');
-            grid.setAttribute('sort-on-load', 'true');
-            grid.setAttribute('sort-column', 'value');
-            grid.setAttribute('sort-direction', 'desc');
-            grid.data = rows;
-            grid.columns = columns;
-            container.innerHTML = '';
-            container.appendChild(grid);
+        async function renderNetConnTypeGrid() {
+            try {
+                const resp = await fetch('/endpoint.php/reports/avg-load-time-connection-type');
+                const data = await resp.json();
+
+                // Ensure numeric conversion
+                data.forEach(row => {
+                    row.count = parseInt(row.count, 10);
+                    row.avgLoadTimeSec = parseFloat(row.avgLoadTimeSec);
+                });
+
+                const columns = [
+                    { index: 'connectionType', header: 'Connection Type', type: 'string', sortable: true },
+                    { index: 'count', header: 'Count', type: 'number', sortable: true },
+                    { index: 'avgLoadTimeSec', header: 'Average Load Time (s)', type: 'number', sortable: true, renderer: (val) => val.toFixed(3) }
+                ];
+
+                const grid = document.createElement('zing-grid');
+                grid.setAttribute('page-size', '20');
+                grid.setAttribute('page-size-options', '10,20,50');
+                grid.setAttribute('sort-on-load', 'true');
+                grid.setAttribute('sort-column', 'count');
+                grid.setAttribute('sort-direction', 'desc');
+                grid.data = data;
+                grid.columns = columns;
+
+                document.getElementById('netConnTypeGrid').appendChild(grid);
+            } catch (error) {
+                console.error('Error rendering Connection Type Grid:', error);
+            }
         }
 
-        async function render() {
+        async function renderPieCharts() {
             try {
-                const [acceptsCookiesKV, allowsJavaScriptKV, userNetConnTypeKV] = await Promise.all([
+                const [acceptsCookiesKV, allowsJavaScriptKV] = await Promise.all([
                     countKeyValue('static','acceptsCookies'),
-                    countKeyValue('static','allowsJavaScript'),
-                    countKeyValue('static','userNetConnType')
+                    countKeyValue('static','allowsJavaScript')
                 ]);
 
                 // Pie charts
@@ -93,7 +109,8 @@
             }
         }
 
-        render();
+        renderNetConnTypeGrid();
+        renderPieCharts();
     </script>
 </body>
 </html>
