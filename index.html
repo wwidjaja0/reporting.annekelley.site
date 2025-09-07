@@ -90,7 +90,35 @@
 
         let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'acceptsCookies')));
         let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsJavaScript')));
-        let userNetConnTypeConfig = generateBarConfig(await countKeyValue('static', 'userNetConnType'));
+
+        // Render network connection types as a ZingGrid instead of a bar chart
+        const userNetConnTypeRaw = await countKeyValue('static', 'userNetConnType');
+        function renderUserNetConnGrid(keyValuePairs = {}) {
+            try {
+                const container = document.getElementById('userNetConnType');
+                if (!container) return;
+                // Prepare rows for the grid
+                const rows = Object.entries(keyValuePairs).map(([k, v]) => ({ connection: k, count: Number(v) }));
+                // Create zing-grid element
+                const grid = document.createElement('zing-grid');
+                grid.setAttribute('page-size', '10');
+                grid.setAttribute('page-size-options', '5,10,20');
+                grid.setAttribute('sort-on-load', 'true');
+                grid.setAttribute('sort-column', 'count');
+                grid.setAttribute('sort-direction', 'desc');
+                grid.data = rows;
+                grid.columns = [
+                    { index: 'connection', header: 'Connection Type', type: 'string', sortable: true },
+                    { index: 'count', header: 'Count', type: 'number', sortable: true }
+                ];
+                // Clear container and append
+                container.innerHTML = '';
+                container.appendChild(grid);
+            } catch (err) {
+                console.error('Error rendering network connection grid:', err);
+            }
+        }
+        renderUserNetConnGrid(userNetConnTypeRaw);
 
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
@@ -276,7 +304,6 @@
         try {
             zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
             zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
-            zingchart.render({ id: 'userNetConnType', data: userNetConnTypeConfig, width: '100%' });
 
             zingchart.render({ id: 'pageLoadTimeTotal', data: pageLoadTimeTotalConfig, width: '100%' });
 
