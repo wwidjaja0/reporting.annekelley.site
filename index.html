@@ -287,19 +287,19 @@
 
             async function renderClickHeatmap() {
                 try {
-                    const data = await getData('activity', ['message', 'mouseX', 'mouseY']);
+                    const data = await getData('activity', ['eventType', 'clientX', 'clientY']);
 
                     console.log(data);
 
                     // keep only click events
-                    const clicks = data.filter(item => item.message === 'click');
+                    const clicks = data.filter(item => item.eventType === 'click');
 
                     console.log(clicks);
 
                     // transform -> [x, y, weight]
                     const heatmapData = clicks.map(item => [
-                        parseInt(item.mouseX, 10),
-                        parseInt(item.mouseY, 10),
+                        parseInt(item.clientX, 10),
+                        parseInt(item.clientY, 10),
                         1
                     ]);
 
