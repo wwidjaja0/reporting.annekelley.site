@@ -36,6 +36,24 @@
     <h1><a href="https://annekelley.site/">annekelley.site</a> Dashboard</h1>
     <p>Hint: Try clicking on different things and using your mouse to navigate around the charts!</p>
 
+    <h2>Reports Preview</h2>
+    <section>
+        <visual-chart id="reportsPreview">
+            <h3>Browsers & Errors (preview)</h3>
+            <p>A compact preview of the <a href="/browsers.html" target="_blank" rel="noopener">full report</a>.</p>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-start;">
+                <div style="width:320px;background:#fff;padding:0.5rem;border-radius:0.5rem;">
+                    <h4 style="margin:0.25rem 0;">Top Errors (preview)</h4>
+                    <div id="dashboardPreviewErrorGrid" style="width:100%;height:180px;overflow:hidden;"></div>
+                </div>
+                <div style="width:320px;background:#fff;padding:0.5rem;border-radius:0.5rem;">
+                    <h4 style="margin:0.25rem 0;">User Agents (preview)</h4>
+                    <div id="dashboardPreviewUserAgentBar" style="width:100%;height:180px;"></div>
+                </div>
+            </div>
+        </visual-chart>
+    </section>
+
     <h2>Static Data</h2>
     <section>
         <visual-chart id="acceptsCookies">
@@ -285,6 +303,89 @@
         } catch (e) {
             console.error("Error rendering chart:", e);
         }
+
+        // --- Reports preview rendering ---
+        async function dashboardRenderPreviewGrid(data) {
+            try {
+                data.forEach(row => { row.count = parseInt(row.count, 10); });
+                data.sort((a, b) => b.count - a.count);
+                const top = data.slice(0, 5);
+                const columns = [
+                    { index: 'message', header: 'Error Message', type: 'string' },
+                    { index: 'count', header: 'Occurrences', type: 'number' }
+                ];
+                const grid = document.createElement('zing-grid');
+                grid.setAttribute('page-size', '5');
+                grid.setAttribute('page-size-options', '5');
+                grid.setAttribute('pager', 'false');
+                grid.style.maxHeight = '180px';
+                grid.style.overflow = 'hidden';
+                grid.data = top;
+                grid.columns = columns;
+                const container = document.getElementById('dashboardPreviewErrorGrid');
+                if (container) {
+                    container.innerHTML = '';
+                    container.appendChild(grid);
+                }
+            } catch (err) {
+                console.error('Error rendering dashboard preview grid:', err);
+            }
+        }
+
+        async function dashboardRenderPreviewChart() {
+            try {
+                const resp = await fetch('/endpoint.php/reports/browser-types');
+                const userAgentData = await resp.json();
+                const browsers = ["Chrome", "Safari", "Firefox"];
+                const platforms = ["Windows", "Mac", "iOS", "Linux"];
+                const agg = {};
+                platforms.forEach(platform => {
+                    agg[platform] = {};
+                    browsers.forEach(browser => agg[platform][browser] = 0);
+                });
+                userAgentData.forEach(row => {
+                    agg[row.platform][row.browser] += parseInt(row.count, 10);
+                });
+                const platformColors = {
+                    Windows: "#377eb8",
+                    Mac: "#4daf4a",
+                    iOS: "#e41a1c",
+                    Linux: "#984ea3"
+                };
+                const series = platforms.map(platform => ({
+                    text: platform,
+                    backgroundColor: platformColors[platform] || "#999",
+                    values: browsers.map(browser => agg[platform][browser])
+                }));
+                const barData = {
+                    type: "bar",
+                    stacked: true,
+                    legend: { visible: false },
+                    scaleX: { labels: browsers },
+                    plotarea: { margin: '40 20 30 40' },
+                    series: series
+                };
+                const target = document.getElementById('dashboardPreviewUserAgentBar');
+                if (target) {
+                    zingchart.render({ id: 'dashboardPreviewUserAgentBar', data: barData, width: '100%', height: 180 });
+                }
+            } catch (err) {
+                console.error('Error rendering dashboard preview chart:', err);
+            }
+        }
+
+        async function dashboardRenderPreviews() {
+            try {
+                const resp = await fetch('/endpoint.php/reports/error-messages');
+                const data = await resp.json();
+                await dashboardRenderPreviewGrid(data);
+                await dashboardRenderPreviewChart();
+            } catch (err) {
+                console.error('Error rendering dashboard previews:', err);
+            }
+        }
+
+        dashboardRenderPreviews();
 
     </script>
 </body>
