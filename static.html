@@ -1,30 +1,92 @@
 <!doctype html>
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Static Data Report — annekelley.site</title>
+    <title>Static Data Report</title>
     <script src="https://annekelley.site/collector.js"></script>
     <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
     <script src="https://cdn.zingchart.com/zingchart.min.js" defer></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; margin: 1rem 2rem; background: #f9f9f9; color:#222 }
-        h1{ font-size:1.8rem }
-        a { color:#2176ff; text-decoration:none }
-        section { background:#eee;border-radius:1rem;padding:1.5rem;margin-top:1.25rem;max-width:960px;margin-left:auto;margin-right:auto }
-        .grid-card, .chart-card { background:#fff;border-radius:0.75rem;padding:1rem;box-shadow:0 0.5rem 1rem rgba(0,0,0,0.12);margin-top:1rem }
-        .card-row { display:flex;gap:1rem;flex-wrap:wrap }
-        .small-chart { width:320px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            margin: 1rem 2rem;
+            background: #f9f9f9;
+            color: #222
+        }
+
+        h1 {
+            font-size: 1.8rem
+        }
+
+        a {
+            color: #2176ff;
+            text-decoration: none
+        }
+
+        section {
+            background: #eee;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1.25rem;
+            max-width: 960px;
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .grid-card,
+        .chart-card {
+            background: #fff;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+            margin-top: 1rem
+        }
+
+        .card-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap
+        }
+
+        .small-chart {
+            width: 320px;
+        }
     </style>
 </head>
+
 <body>
-    <h1><a href="/">annekelley.site</a> — Static Data Report</h1>
+    <h1><a href="/">reporting.annekelley.site</a> — Static Data Report</h1>
     <nav style="margin-top:0.5rem;">
         <a href="/index.html">Dashboard</a> ·
-    <!-- Dynamic report removed -->
+        <!-- Dynamic report removed -->
         <a href="/browsers.html">Browsers Report</a> ·
         <a href="/langs.html">Languages Report</a>
     </nav>
+    <!-- SECTION: Question -->
+    <section aria-label="Report Question">
+        <h2>Question</h2>
+        <div class="section-content">
+            Are our users equipped with the expected client-side resources
+            (such as cookies, JavaScript support, and stable network connections)
+            to fully utilize the server we developed?
+        </div>
+    </section>
 
+    <!-- SECTION: Data -->
+    <section aria-label="Static Data" class="datacontent">
+        <h2>Data</h2>
+        <div class="section-content">
+            We observe that nearly all users allow cookies and JavaScript. These features
+            are required for the reporting site to function, so this is reassuring. Additionally,
+            we collected information about network connection types and load times.
+            However, note that parts of the network data are artificially generated,
+            so they should be interpreted with caution.
+        </div>
+        <!-- (Your charts + grids already embedded above) -->
+    </section>
+
+    <!-- SECTION: Static indicators (charts + grid) -->
     <section aria-label="Static Data">
         <h2>Static indicators</h2>
         <div class="card-row">
@@ -44,6 +106,40 @@
         </div>
     </section>
 
+    <section aria-label="Report Discussion">
+        <h2>Discussion</h2>
+        <div class="section-content">
+            Analysis of collected client data shows that the vast majority of users
+            have JavaScript enabled, cookies available, and functional screen/window
+            resolutions. A small fraction of users either block certain features or
+            have missing values. These gaps may indicate restrictive environments
+            (e.g., privacy-focused browsers, extensions, or limited devices).
+            Overall, users appear to possess the resources needed, but edge cases
+            exist where functionality may degrade.
+        </div>
+    </section>
+
+    <section aria-label="Report Action">
+        <h2>Action</h2>
+        <div class="section-content">
+            We can implement graceful fallbacks for users with limited resources
+            (e.g., no cookies or disabled JavaScript). This includes providing
+            simplified server responses and alternative interaction methods where
+            possible. We would like to apply progressive enhancement where possible.
+        </div>
+    </section>
+
+    <section aria-label="Report Conclusion">
+        <h2>Conclusion</h2>
+        <div class="section-content">
+            Users largely meet the expected resource requirements for our server.
+            However, acknowledging and supporting the minority of users with
+            restricted environments will strengthen overall accessibility and
+            reliability of the system.
+        </div>
+    </section>
+    </section>
+
     <script type="module">
         import { countKeyValue } from '/fetch.js';
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
@@ -52,7 +148,7 @@
             // map common Yes/No variants to colors
             const yesColor = '#16a34a';
             const noColor = '#dc2626';
-            function colorForKey(k){
+            function colorForKey(k) {
                 const s = String(k).trim().toLowerCase();
                 if (s === 'yes' || s === '1' || s === 'true') return yesColor;
                 if (s === 'no' || s === '0' || s === 'false') return noColor;
@@ -101,7 +197,7 @@
                 console.error('Error rendering Connection Type Grid:', error);
             }
         }
-        function createGrid(containerId, rows = [], columns = []){
+        function createGrid(containerId, rows = [], columns = []) {
             const container = document.getElementById(containerId);
             if (!container) return;
             const grid = document.createElement('zing-grid');
@@ -134,9 +230,9 @@
         }
 
         // normalize keys like '0','1', 0,1, 'true','false' into 'Yes'/'No' labels and sum counts
-        function normalizeYesNoKV(kv = {}){
+        function normalizeYesNoKV(kv = {}) {
             const out = {};
-            Object.entries(kv || {}).forEach(([k,v]) => {
+            Object.entries(kv || {}).forEach(([k, v]) => {
                 const s = String(k).trim().toLowerCase();
                 let label = k;
                 if (s === '1' || s === 'true' || s === 'yes') label = 'Yes';
@@ -150,8 +246,8 @@
         async function renderPieCharts() {
             try {
                 const [acceptsCookiesKV, allowsJavaScriptKV] = await Promise.all([
-                    countKeyValue('static','acceptsCookies'),
-                    countKeyValue('static','allowsJavaScript')
+                    countKeyValue('static', 'acceptsCookies'),
+                    countKeyValue('static', 'allowsJavaScript')
                 ]);
 
                 // Pie charts (normalize 0/1 -> Yes/No so labels and colors apply)
@@ -161,9 +257,9 @@
                 zingchart.render({ id: 'allowsJavaScriptPreview', data: allowsCfg, width: '100%', height: 220 });
 
                 // Grid: build rows and pre-sort by count (desc) so grid shows greatest-to-least
-                let rows = Object.entries(userNetConnTypeKV || {}).map(([k,v]) => ({ connection: k, count: Number(v) }));
-                rows = rows.sort((a,b) => (Number(b.count) || 0) - (Number(a.count) || 0));
-                createGrid('userNetConnTypeGrid', rows, [ { index: 'connection', header: 'Connection Type' }, { index: 'count', header: 'Count', type: 'number' }]);
+                let rows = Object.entries(userNetConnTypeKV || {}).map(([k, v]) => ({ connection: k, count: Number(v) }));
+                rows = rows.sort((a, b) => (Number(b.count) || 0) - (Number(a.count) || 0));
+                createGrid('userNetConnTypeGrid', rows, [{ index: 'connection', header: 'Connection Type' }, { index: 'count', header: 'Count', type: 'number' }]);
             } catch (err) {
                 console.error('Static report render error:', err);
             }
@@ -173,4 +269,5 @@
         renderPieCharts();
     </script>
 </body>
+
 </html>

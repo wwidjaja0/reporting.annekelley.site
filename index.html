@@ -101,7 +101,7 @@
         <a href="/langs.html" target="_self" rel="noopener">Languages Report</a>
     </nav>
 
-    <h2 id="static-data" class="section-title">reporting.annekelley.site Static Data Report</h2>
+    <h2 id="static-data" class="section-title">Static Data Report — Previews</h2>
     <section>
         <article id="acceptsCookies" class="visual-card" role="region" aria-labelledby="acceptsCookiesTitle">
             <div class="card-header">
@@ -263,6 +263,43 @@
             createZingGrid(containerId, rows, [ { index: 'key', header: 'Key', type: 'string' }, { index: 'value', header: 'Count', type: 'number' } ], { pageSize: 10, pageOptions: '5,10,20', sortOnLoad: true, sortColumn: 'value', sortDirection: 'desc' });
         }
 
+        // Render the more detailed, sorted connection-type grid (copied from static.html)
+        async function renderNetConnTypeGridPreview() {
+            try {
+                const resp = await fetch('/endpoint.php/reports/avg-load-time-connection-type');
+                const data = await resp.json();
+
+                // Ensure numeric conversion
+                data.forEach(row => {
+                    row.count = parseInt(row.count, 10);
+                    row.avgLoadTimeSec = parseFloat(row.avgLoadTimeSec);
+                });
+
+                const columns = [
+                    { index: 'connectionType', header: 'Connection Type', type: 'string', sortable: true },
+                    { index: 'count', header: 'Count', type: 'number', sortable: true },
+                    { index: 'avgLoadTimeSec', header: 'Average Load Time (s)', type: 'number', sortable: true, renderer: (val) => val.toFixed(3) }
+                ];
+
+                const grid = document.createElement('zing-grid');
+                grid.setAttribute('page-size', '10');
+                grid.setAttribute('page-size-options', '5,10,20');
+                grid.setAttribute('sort-on-load', 'true');
+                grid.setAttribute('sort-column', 'count');
+                grid.setAttribute('sort-direction', 'desc');
+                grid.data = data;
+                grid.columns = columns;
+
+                const container = document.getElementById('userNetConnTypePreview');
+                if (container) {
+                    container.innerHTML = '';
+                    container.appendChild(grid);
+                }
+            } catch (error) {
+                console.error('Error rendering Connection Type Grid (preview):', error);
+            }
+        }
+
 
         // --- Initialization ---
         async function init(){
@@ -281,7 +318,7 @@
                 zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
 
                 // userNetConnType as grid (sorted, preview)
-                renderGridFromKeyValue('userNetConnTypePreview', userNetConnTypeKV || {});
+                renderNetConnTypeGridPreview();
 
                 // Activity / scatter plots
                 const activityData = await getData('activity', ['eventType','clientX','clientY','url']);
