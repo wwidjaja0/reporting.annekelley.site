@@ -84,8 +84,20 @@
     </section>
     <section>
         <h2>Activity Data</h2>
-        <visual-chart id="mouseScatterplot">
-            <h3>mouseScatterplot</h3>
+        <visual-chart id="mouseScatterplotHome">
+            <h3>mouseScatterplot - Home Page</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="mouseScatterplotCGI">
+            <h3>mouseScatterplot - CGI Pages</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="mouseScatterplot404">
+            <h3>mouseScatterplot - 404 Page</h3>
+            <p></p>
+        </visual-chart>
+        <visual-chart id="mouseScatterplotNull">
+            <h3>mouseScatterplot - Null URL Values</h3>
             <p></p>
         </visual-chart>
         <visual-chart id="errors">
@@ -114,7 +126,6 @@
 
         let userAgentConfig = generateWordCloudConfig(await userAgentsToWordCloud());
         let userLangConfig = generateBarConfig(await countKeyValue('userLang'));
-        console.log(mapYesNo(await countKeyValue('acceptsCookies')));
         let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('acceptsCookies')));
         let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsJavaScript')));
         let allowsImagesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('allowsImages')));
@@ -126,6 +137,17 @@
         let pageLoadTimeTotalConfig = generateHorizontalBoxPlot(await count('pageLoadTimeTotal'));
 
         let errorsConfig = generateWordCloudConfig(await errorsToWordCloud());
+
+        const activityData = await getData('activity', ['eventType', 'clientX', 'clientY', 'url']);
+        const homePageClicks = data.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/index.html' || item.url === 'https://annekelley.site/');
+        const cgiPerlBinClicks = data.filter(item => item.eventType === 'click' && String(item.url).includes('https://annekelley.site/cgi-bin/'));
+        const page404Clicks = data.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/404.html');
+        const clicksFromMissingURL = data.filter(item => item.eventType === 'click' && item.url === null);
+
+        let scatterHomeConfig = generateScatterPlot(homePageClicks);
+        let scatterCGIConfig = generateScatterPlot(cgiPerlBinClicks);
+        let scatter404Config = generateScatterPlot(page404Clicks);
+        let scatterNullConfig = generateScatterPlot(clicksFromMissingURL);
 
         /**
          * Generates configuration for a word cloud chart.
@@ -286,6 +308,51 @@
             };
         }
 
+        /**
+         * Generates configuration for a scatter plot chart.
+         * @param {Array} dataPoints - Array of [x, y] coordinate pairs for the scatter plot.
+         * @param {Object} otherOptions - Additional options for the scatter plot.
+         * @returns {Object} - Configuration object for the scatter plot.
+         */
+        function generateScatterPlot(dataPoints, otherOptions) {
+            const dataPoints = clicks.map(item => [
+                parseInt(item.clientX, 10),
+                parseInt(item.clientY, 10)
+            ]);
+
+            const maxX = Math.max(...dataPoints.map(d => d[0]).filter(v => !isNaN(v)), 0);
+            const maxY = Math.max(...dataPoints.map(d => d[1]).filter(v => !isNaN(v)), 0);
+
+            return {
+                type: 'hscatter',
+                backgroundColor: '#fff',
+                plot: {
+                    marker: {
+                        type: 'circle',
+                        size: 4,
+                        backgroundColor: '#ff0000'
+                    },
+                    tooltip: {
+                        text: 'Click at (%kvx, %kvy)'
+                    }
+                },
+                scaleX: {
+                    values: `0:100:10`,
+                    visible: true
+                },
+                scaleY: {
+                    values: `0:100:10`,
+                    visible: true
+                },
+                series: [
+                    {
+                        values: dataPoints
+                    }
+                ],
+                otherOptions
+            };
+        }
+
         try {
             zingchart.render({ id: 'userAgent', data: userAgentConfig, width: '100%' });
             zingchart.render({ id: 'userLang', data: userLangConfig, width: '100%' });
@@ -299,73 +366,10 @@
             zingchart.render({ id: 'pageLoadEnd', data: pageLoadEndConfig, width: '100%' });
             zingchart.render({ id: 'pageLoadTimeTotal', data: pageLoadTimeTotalConfig, width: '100%' });
 
-            async function renderClickScatterplot() {
-                try {
-                    const data = await getData('activity', ['eventType', 'clientX', 'clientY', 'url']);
-
-                    console.log(data);
-
-                    // keep only click events
-                    const clicks = data.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/index.html');
-
-                    console.log(clicks);
-
-                    // transform -> [x, y]
-                    const scatterData = clicks.map(item => [
-                        parseInt(item.clientX, 10),
-                        parseInt(item.clientY, 10)
-                    ]);
-
-                    console.log(scatterData);
-
-                    // get max values for scaling
-                    const maxX = Math.max(...scatterData.map(d => d[0]).filter(v => !isNaN(v)), 0);
-                    const maxY = Math.max(...scatterData.map(d => d[1]).filter(v => !isNaN(v)), 0);
-
-                    const scatterConfig = {
-                        type: 'hscatter',
-                        backgroundColor: '#fff',
-                        plot: {
-                            marker: {
-                                type: 'circle',
-                                size: 4,
-                                backgroundColor: '#ff0000'
-                            },
-                            tooltip: {
-                                text: 'Click at (%kvx, %kvy)'
-                            }
-                        },
-                        scaleX: {
-                            values: `0:${maxX}:${Math.round(maxX / 10) || 1}`,
-                            visible: true
-                        },
-                        scaleY: {
-                            values: `0:${maxY}:${Math.round(maxY / 10) || 1}`,
-                            visible: true
-                        },
-                        series: [
-                            {
-                                values: scatterData
-                            }
-                        ]
-                    };
-
-                    zingchart.render({
-                        id: 'mouseScatterplot',
-                        data: scatterConfig,
-                        width: 800,
-                        height: 600,
-                        output: 'canvas'
-                    });
-
-
-                } catch (err) {
-                    console.error('Scatterplot failed:', err);
-                }
-            }
-
-            renderClickScatterplot();
-
+            zingchart.render({ id: 'mouseScatterplotHome', data: scatterHomeConfig, width: '100%' });
+            zingchart.render({ id: 'mouseScatterplotCGI', data: scatterCGIConfig, width: '100%' });
+            zingchart.render({ id: 'mouseScatterplot404', data: scatter404Config, width: '100%' });
+            zingchart.render({ id: 'mouseScatterplotNull', data: scatterNullConfig, width: '100%' });
             zingchart.render({ id: 'errors', data: errorsConfig, width: '100%' });
         } catch (e) {
             console.error("Error rendering chart:", e);
