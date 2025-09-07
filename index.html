@@ -50,10 +50,22 @@
 
         section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: 1fr;
             gap: 1rem;
             padding: 0.25rem 0;
             align-items: start;
+        }
+
+        /* Two-column layout on wider screens; if a section has an odd number of cards
+           make the final card span both columns so it takes the full width. */
+        @media (min-width: 780px) {
+            section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            /* selector: the last child in the section, when it's at an odd index (i.e. odd count) */
+            section > .visual-card:last-child:nth-child(odd) {
+                grid-column: 1 / -1;
+            }
         }
 
         /* Use semantic article containers for visualizations for better accessibility */
