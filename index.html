@@ -11,60 +11,90 @@
 <body>
     <!-- ZingChart -->
     <style>
+        :root{
+            --card-bg: #eee;
+            --card-radius: 1rem;
+            --card-pad: 1rem;
+            --page-pad: 1rem;
+        }
+
+        .top-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.08);
+            margin: 0.5rem 1rem 1rem 1rem;
+        }
+        .top-nav a { color: #2176ff; text-decoration:none; font-weight:600 }
+
         section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
             gap: 1rem;
-            padding: 1rem;
+            padding: var(--page-pad);
+            align-items: start;
         }
 
-        visual-chart {
-            background: #eee;
-            border-radius: 1rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
-            padding: 1rem;
+        /* Use semantic article containers for visualizations for better accessibility */
+        .visual-card {
+            background: var(--card-bg);
+            border-radius: var(--card-radius);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+            padding: var(--card-pad);
+            min-height: 120px;
+            display: block;
         }
 
-        visual-grid {
-            background: #eee;
-            border-radius: 1rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
-            padding: 1rem;
+        .section-title {
+            margin: 1.25rem 0 0.25rem 0;
+            font-size: 1.25rem;
         }
+
+        .card-small { padding: 0.5rem; }
     </style>
 
-    <h1><a href="https://annekelley.site/">annekelley.site</a> Dashboard</h1>
+    <h1>Dashboard</h1>
     <p>Hint: Try clicking on different things and using your mouse to navigate around the charts!</p>
 
-    <h2><a href="https://annekelley.site/">annekelley.site</a> Static Data Report</h2>
+    <nav class="top-nav" aria-label="Main Navigation">
+        <a href="#static-data">Static Data</a>
+        <a href="#dynamic-data">Dynamic Data</a>
+        <a href="/browsers.html" target="_blank" rel="noopener">Full Reports</a>
+        <span style="margin-left:auto;color:#666;font-size:0.95rem;">Quick glance dashboard</span>
+    </nav>
+
+    <h2 id="static-data" class="section-title"><a href="https://annekelley.site/static.html">annekelley.site</a> Static Data Report</h2>
     <section>
-        <visual-chart id="acceptsCookies">
-            <h3>acceptsCookies</h3>
+        <article id="acceptsCookies" class="visual-card" role="region" aria-labelledby="acceptsCookiesTitle">
+            <h3 id="acceptsCookiesTitle">acceptsCookies</h3>
             <p>A <em>pie chart</em> displaying the % of users that accept cookies.</p>
-        </visual-chart>
-        <visual-chart id="allowsJavaScript">
-            <h3>allowsJavaScript</h3>
+        </article>
+        <article id="allowsJavaScript" class="visual-card" role="region" aria-labelledby="allowsJavaScriptTitle">
+            <h3 id="allowsJavaScriptTitle">allowsJavaScript</h3>
             <p>A <em>pie chart</em> displaying the % of users that allow JavaScript.</p>
-        </visual-chart>
-        <visual-chart id="userNetConnType">
-            <h3>userNetConnType</h3>
+        </article>
+        <article id="userNetConnType" class="visual-card" role="region" aria-labelledby="userNetConnTypeTitle">
+            <h3 id="userNetConnTypeTitle">userNetConnType</h3>
             <p>A <em>bar chart</em> displaying the most frequent network connection.</p>
-        </visual-chart>
+        </article>
     </section>
-    <h2><a href="https://annekelley.site/">annekelley.site</a> Dynamic Data Report</h2>
+    <h2 id="dynamic-data" class="section-title"><a href="https://annekelley.site/">annekelley.site</a> Dynamic Data Report</h2>
     <section>
-        <visual-chart id="pageLoadTimeTotal">
-            <h3>pageLoadTimeTotal</h3>
+        <article id="pageLoadTimeTotal" class="visual-card" role="region" aria-labelledby="pageLoadTimeTotalTitle">
+            <h3 id="pageLoadTimeTotalTitle">pageLoadTimeTotal</h3>
             <p>A <em>bar plot</em> displaying the quartiles of the total page load time across all pages.</p>
-        </visual-chart>
-        <visual-chart id="mouseScatterplotHome">
-            <h3>mouseScatterplot - Home Page</h3>
+        </article>
+        <article id="mouseScatterplotHome" class="visual-card" role="region" aria-labelledby="mouseScatterplotHomeTitle">
+            <h3 id="mouseScatterplotHomeTitle">mouseScatterplot - Home Page</h3>
             <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks across the homepage.</p>
-        </visual-chart>
-        <visual-chart id="mouseScatterplot404">
-            <h3>mouseScatterplot - 404 Page</h3>
+        </article>
+        <article id="mouseScatterplot404" class="visual-card" role="region" aria-labelledby="mouseScatterplot404Title">
+            <h3 id="mouseScatterplot404Title">mouseScatterplot - 404 Page</h3>
             <p>A <em>scatter plot</em> displaying the coordinates of mouse clicks on the 404 page.</p>
-        </visual-chart>
+        </article>
     </section>
     <script type="module">
         // Retrieves getData function, which requests columns from a table of the web_analytics DB
@@ -72,55 +102,19 @@
 
         ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
 
-        function mapYesNo(counts) {
-            const keys = Object.keys(counts);
-
-            if (keys.length >= 2 && keys.includes("0") && keys.includes("1")) {
-                return {
-                    No: counts["0"] || 0,
-                    Yes: counts["1"] || 0
-                };
+        // --- Utilities ---
+        const mapYesNo = (counts = {}) => {
+            const keys = Object.keys(counts || {});
+            if (keys.length >= 2 && keys.includes('0') && keys.includes('1')) {
+                return { No: counts['0'] || 0, Yes: counts['1'] || 0 };
             }
-
             return counts;
-        }
+        };
 
-        let acceptsCookiesConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'acceptsCookies')));
-        let allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(await countKeyValue('static', 'allowsJavaScript')));
-
-        // Render network connection types as a ZingGrid instead of a bar chart
-        const userNetConnTypeRaw = await countKeyValue('static', 'userNetConnType');
-        function renderUserNetConnGrid(keyValuePairs = {}) {
-            try {
-                const container = document.getElementById('userNetConnType');
-                if (!container) return;
-                // Prepare rows for the grid
-                const rows = Object.entries(keyValuePairs).map(([k, v]) => ({ connection: k, count: Number(v) }));
-                // Create zing-grid element
-                const grid = document.createElement('zing-grid');
-                grid.setAttribute('page-size', '10');
-                grid.setAttribute('page-size-options', '5,10,20');
-                grid.setAttribute('sort-on-load', 'true');
-                grid.setAttribute('sort-column', 'count');
-                grid.setAttribute('sort-direction', 'desc');
-                grid.data = rows;
-                grid.columns = [
-                    { index: 'connection', header: 'Connection Type', type: 'string', sortable: true },
-                    { index: 'count', header: 'Count', type: 'number', sortable: true }
-                ];
-                container.appendChild(grid);
-            } catch (err) {
-                console.error('Error rendering network connection grid:', err);
-            }
-        }
-        renderUserNetConnGrid(userNetConnTypeRaw);
-
-        // Replace the boxplot with a summary grid for page load times
-        const pageLoadTimeValues = await count('pageLoadTimeTotal');
-        function computeStats(values = []) {
-            const nums = values.map(v => Number(v)).filter(v => !Number.isNaN(v)).sort((a,b)=>a-b);
+        const computeStats = (values = []) => {
+            const nums = (values || []).map(Number).filter(v => !Number.isNaN(v)).sort((a,b)=>a-b);
             const n = nums.length;
-            if (n === 0) return {};
+            if (n === 0) return null;
             const sum = nums.reduce((s,x)=>s+x,0);
             const mean = sum / n;
             const median = nums[Math.floor(n/2)];
@@ -131,230 +125,126 @@
             const variance = nums.reduce((s,x)=>s+Math.pow(x-mean,2),0)/n;
             const std = Math.sqrt(variance);
             return { count: n, min, Q1, median, Q3, max, mean, std };
-        }
+        };
 
-        function renderPageLoadTimeGrid(values) {
+        function createZingGrid(containerId, rows = [], columns = [], options = {}){
+            const container = document.getElementById(containerId);
+            if (!container) return null;
             try {
-                const stats = computeStats(values || []);
-                const container = document.getElementById('pageLoadTimeTotal');
-                if (!container) return;
-                const rows = [
-                    { metric: 'Count', value: stats.count || 0 },
-                    { metric: 'Min (ms)', value: Math.round(stats.min || 0) },
-                    { metric: 'Q1 (ms)', value: Math.round(stats.Q1 || 0) },
-                    { metric: 'Median (ms)', value: Math.round(stats.median || 0) },
-                    { metric: 'Q3 (ms)', value: Math.round(stats.Q3 || 0) },
-                    { metric: 'Max (ms)', value: Math.round(stats.max || 0) },
-                    { metric: 'Mean (ms)', value: Math.round(stats.mean || 0) },
-                    { metric: 'Std Dev (ms)', value: Math.round(stats.std || 0) }
-                ];
                 const grid = document.createElement('zing-grid');
-                grid.setAttribute('page-size', '10');
-                grid.setAttribute('page-size-options', '5,10');
-                grid.setAttribute('sort-on-load', 'false');
+                if (options.pageSize) grid.setAttribute('page-size', String(options.pageSize));
+                if (options.pageOptions) grid.setAttribute('page-size-options', options.pageOptions);
+                if (options.sortOnLoad) grid.setAttribute('sort-on-load', String(options.sortOnLoad));
+                if (options.sortColumn) grid.setAttribute('sort-column', options.sortColumn);
+                if (options.sortDirection) grid.setAttribute('sort-direction', options.sortDirection);
                 grid.data = rows;
-                grid.columns = [
-                    { index: 'metric', header: 'Metric', type: 'string' },
-                    { index: 'value', header: 'Value', type: 'number' }
-                ];
+                grid.columns = columns;
+                container.innerHTML = '';
                 container.appendChild(grid);
+                return grid;
             } catch (err) {
-                console.error('Error rendering page load time grid:', err);
+                console.error('createZingGrid error:', err);
+                return null;
             }
         }
 
-        renderPageLoadTimeGrid(pageLoadTimeValues);
-
-        const activityData = await getData('activity', ['eventType', 'clientX', 'clientY', 'url']);
-
-        const homePageClicks = activityData.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/index.html' || item.url === 'https://annekelley.site/');
-        const cgiPerlBinClicks = activityData.filter(item => item.eventType === 'click' && String(item.url).includes('https://annekelley.site/cgi-bin/'));
-        const page404Clicks = activityData.filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/404.html');
-
-        let scatterHomeConfig = generateScatterPlot(homePageClicks);
-        let scatterCGIConfig = generateScatterPlot(cgiPerlBinClicks);
-        let scatter404Config = generateScatterPlot(page404Clicks);
-
-        /**generateBarConfig
-         * Generates configuration for a bar chart.
-         * @param {JSON} keyValuePairs - Labels paired with values for the bar chart.
-         * @param {Object} otherOptions - Additional options for the bar chart.
-         * @returns {Object} - Configuration object for the bar chart.
-         */
+        // --- Chart/Config generators ---
         function generateBarConfig(keyValuePairs = {}, otherOptions) {
-            console.log("Generating bar config with data:", keyValuePairs);
             return {
-                type: "bar",
-                plot: {
-                    showZero: true
-                },
-                scaleX: {
-                    values: Object.keys(keyValuePairs), // x-axis labels
-                    item: {
-                        angle: -45,
-                    },
-                    step: 1,
-                    'items-overlap': true
-                },
-                series: [
-                    { values: Object.values(keyValuePairs) } // y-axis values
-                ]
-            };
-        }
-
-        /**
-         * Generates configuration for a pie chart.
-         * @param {Array} keyValuePairs - Labels paired with values for the pie chart.
-         * @param {Object} otherOptions - Additional options for the pie chart.
-         * @returns {Object} - Configuration object for the pie chart.
-         */
-        function generateNavPieConfig(keyValuePairs = {}, otherOptions) {
-            return {
-                type: 'navpie',
-                plot: {
-                    detach: true,
-                    valueBox: {
-                        text: '%t\n%npv%'
-                    },
-                    tooltip: {
-                        text: "%npv%<br>Count: %v"
-                    },
-                },
-                series: Object.entries(keyValuePairs).map(([key, value]) => ({
-                    text: key,
-                    values: [value]
-                })),
-                otherOptions,
-            }
-        }
-
-        /**
-         * Generates configuration for a horizontal box plot chart.
-         * @param {Array} values - Array of numerical values for the box plot.
-         * @returns {Object} - Configuration object for the horizontal box plot.
-         */
-        function generateHorizontalBoxPlot(values, otherOptions) {
-
-            values.sort((a, b) => a - b); // Sort values in ascending order
-
-            const median = values[Math.floor(values.length / 2)];
-            const Q1 = values[Math.floor(values.length / 4)];
-            const Q3 = values[Math.floor((3 * values.length) / 4)];
-            const IQR = Q3 - Q1;
-            const lowerFence = Q1 - 1.5 * IQR;
-            const upperFence = Q3 + 1.5 * IQR;
-            const outliers = values.filter(v => v < lowerFence || v > upperFence);
-            const boxPlotValues = [
-                Math.max(Math.min(...values.filter(v => v >= lowerFence)), Math.min(...values)), // min (excluding outliers)
-                Q1, // lower quartile
-                median, // median
-                Q3, // upper quartile
-                Math.min(Math.max(...values.filter(v => v <= upperFence)), Math.max(...values)) // max (excluding outliers)
-            ];
-
-            return {
-                graphset: [{
-                    type: "hboxplot",
-                    plotarea: {
-                        margin: 'dynamic'
-                    },
-                    scaleY: {
-                        zooming: true,
-                        label: {
-                            text: "Milliseconds (ms)"
-                        },
-                    },
-                    tooltip: {
-                        visible: true,
-                        alpha: 0.8,
-                        backgroundColor: 'black',
-                        borderRadius: 8,
-                        borderColor: 'none',
-                        fontColor: 'yellow',
-                        fontSize: 14,
-                    },
-                    options: {
-                        box: {
-                            "barWidth": 0.1,
-                            tooltip: {
-                                text: "Observations:<br>Maximum: <strong>%data-max</strong><br>Upper Quartile: <strong>%data-upper-quartile</strong><br>Median: <strong>%data-median</strong><br>Lower Quartile: <strong>%data-lower-quartile</strong><br>Minimum: <strong>%data-min</strong>"
-                            }
-                        },
-                    },
-                    outlier: {
-                        tooltip: {
-                        },
-                        marker: {
-                            type: 'circle',
-                            backgroundColor: '#ff0'
-                        }
-                    },
-                    series: [{
-                        dataBox: [boxPlotValues],
-                        dataOutlier: [outliers]
-                    }],
-                    otherOptions
-                }]
-            };
-        }
-
-        /**
-         * Generates configuration for a scatter plot chart.
-         * @param {Array} dataPoints - Array of [x, y] coordinate pairs for the scatter plot.
-         * @param {Object} otherOptions - Additional options for the scatter plot.
-         * @returns {Object} - Configuration object for the scatter plot.
-         */
-        function generateScatterPlot(clicks, otherOptions) {
-            const scatterData = clicks.map(item => [
-                parseInt(item.clientX, 10),
-                parseInt(item.clientY, 10)
-            ]);
-
-
-            const maxX = Math.max(...scatterData.map(d => d[0]).filter(v => !isNaN(v)), 0);
-            const maxY = Math.max(...scatterData.map(d => d[1]).filter(v => !isNaN(v)), 0);
-
-            return {
-                type: 'hscatter',
-                backgroundColor: '#fff',
-                plot: {
-                    marker: {
-                        type: 'circle',
-                        size: 4,
-                        backgroundColor: '#ff0000'
-                    },
-                    tooltip: {
-                        text: 'Click at (%kvx, %kvy)'
-                    }
-                },
-                scaleX: {
-                    values: `0:${maxX}:${Math.round(maxX / 10) || 1}`,
-                    visible: true
-                },
-                scaleY: {
-                    values: `0:${maxY}:${Math.round(maxY / 10) || 1}`,
-                    visible: true
-                },
-                series: [
-                    {
-                        values: scatterData
-                    }
-                ],
+                type: 'bar',
+                plot: { showZero: true },
+                scaleX: { values: Object.keys(keyValuePairs), item: { angle: -45 }, step: 1, 'items-overlap': true },
+                series: [{ values: Object.values(keyValuePairs) }],
                 otherOptions
             };
         }
 
-        try {
-            zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
-            zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
-
-            // pageLoadTimeTotal is now rendered as a grid via renderPageLoadTimeGrid
-
-            zingchart.render({ id: 'mouseScatterplotHome', data: scatterHomeConfig, width: '100%' });
-            zingchart.render({ id: 'mouseScatterplot404', data: scatter404Config, width: '100%' });
-        } catch (e) {
-            console.error("Error rendering chart:", e);
+        function generateNavPieConfig(keyValuePairs = {}, otherOptions) {
+            return {
+                type: 'navpie',
+                plot: { detach: true, valueBox: { text: '%t\n%npv%' }, tooltip: { text: '%npv%<br>Count: %v' } },
+                series: Object.entries(keyValuePairs).map(([key, value]) => ({ text: key, values: [value] })),
+                otherOptions
+            };
         }
+
+        function generateScatterPlot(clicks = [], otherOptions) {
+            const scatterData = (clicks || []).map(item => [ parseInt(item.clientX, 10) || 0, parseInt(item.clientY, 10) || 0 ]);
+            const maxX = Math.max(...scatterData.map(d => d[0]).filter(v => !isNaN(v)), 0);
+            const maxY = Math.max(...scatterData.map(d => d[1]).filter(v => !isNaN(v)), 0);
+            return {
+                type: 'hscatter', backgroundColor: '#fff',
+                plot: { marker: { type: 'circle', size: 4, backgroundColor: '#ff0000' }, tooltip: { text: 'Click at (%kvx, %kvy)' } },
+                scaleX: { values: `0:${maxX}:${Math.round(maxX/10) || 1}`, visible: true },
+                scaleY: { values: `0:${maxY}:${Math.round(maxY/10) || 1}`, visible: true },
+                series: [{ values: scatterData }], otherOptions
+            };
+        }
+
+        // --- Renderers ---
+        function renderGridFromKeyValue(containerId, keyValuePairs){
+            const rows = Object.entries(keyValuePairs || {}).map(([k,v]) => ({ key: k, value: Number(v) }));
+            createZingGrid(containerId, rows, [ { index: 'key', header: 'Key', type: 'string' }, { index: 'value', header: 'Count', type: 'number' } ], { pageSize: 10, pageOptions: '5,10,20', sortOnLoad: true, sortColumn: 'value', sortDirection: 'desc' });
+        }
+
+        function renderPageLoadStatsGrid(containerId, values){
+            const stats = computeStats(values) || { count: 0, min:0, Q1:0, median:0, Q3:0, max:0, mean:0, std:0 };
+            const rows = [
+                { metric: 'Count', value: stats.count },
+                { metric: 'Min (ms)', value: Math.round(stats.min) },
+                { metric: 'Q1 (ms)', value: Math.round(stats.Q1) },
+                { metric: 'Median (ms)', value: Math.round(stats.median) },
+                { metric: 'Q3 (ms)', value: Math.round(stats.Q3) },
+                { metric: 'Max (ms)', value: Math.round(stats.max) },
+                { metric: 'Mean (ms)', value: Math.round(stats.mean) },
+                { metric: 'Std Dev (ms)', value: Math.round(stats.std) }
+            ];
+            createZingGrid(containerId, rows, [ { index: 'metric', header: 'Metric', type: 'string' }, { index: 'value', header: 'Value', type: 'number' } ], { pageSize: 10, pageOptions: '5,10' });
+        }
+
+        // --- Initialization ---
+        async function init(){
+            try {
+                // Static stats
+                const [acceptsCookiesKV, allowsJavaScriptKV, userNetConnTypeKV] = await Promise.all([
+                    countKeyValue('static','acceptsCookies'),
+                    countKeyValue('static','allowsJavaScript'),
+                    countKeyValue('static','userNetConnType')
+                ]);
+
+                const acceptsCookiesConfig = generateNavPieConfig(mapYesNo(acceptsCookiesKV || {}));
+                const allowsJavaScriptConfig = generateNavPieConfig(mapYesNo(allowsJavaScriptKV || {}));
+
+                zingchart.render({ id: 'acceptsCookies', data: acceptsCookiesConfig, width: '100%' });
+                zingchart.render({ id: 'allowsJavaScript', data: allowsJavaScriptConfig, width: '100%' });
+
+                // userNetConnType as grid
+                renderGridFromKeyValue('userNetConnType', userNetConnTypeKV || {});
+
+                // Page load times
+                const pageLoadTimeValues = await count('pageLoadTimeTotal');
+                renderPageLoadStatsGrid('pageLoadTimeTotal', pageLoadTimeValues || []);
+
+                // Activity / scatter plots
+                const activityData = await getData('activity', ['eventType','clientX','clientY','url']);
+                const homePageClicks = (activityData || []).filter(item => item.eventType === 'click' && (item.url === 'https://annekelley.site/index.html' || item.url === 'https://annekelley.site/'));
+                const cgiPerlBinClicks = (activityData || []).filter(item => item.eventType === 'click' && String(item.url).includes('https://annekelley.site/cgi-bin/'));
+                const page404Clicks = (activityData || []).filter(item => item.eventType === 'click' && item.url === 'https://annekelley.site/404.html');
+
+                const scatterHomeConfig = generateScatterPlot(homePageClicks);
+                const scatterCGIConfig = generateScatterPlot(cgiPerlBinClicks);
+                const scatter404Config = generateScatterPlot(page404Clicks);
+
+                zingchart.render({ id: 'mouseScatterplotHome', data: scatterHomeConfig, width: '100%' });
+                zingchart.render({ id: 'mouseScatterplot404', data: scatter404Config, width: '100%' });
+
+            } catch (err) {
+                console.error('Dashboard initialization error:', err);
+            }
+        }
+
+        // run init
+        init();
 
     </script>
 </body>
