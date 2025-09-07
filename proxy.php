@@ -19,20 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $resource = $_GET['resource'] ?? '';
 $cols     = $_GET['cols'] ?? '';
 
-print_r($_GET);
-
-// Handle array of cols (cols[]=userLang&cols[]=userAgent)
-if (is_array($cols)) {
-    $cols = implode(',', $cols); // turn into "userLang,userAgent"
-}
-
 // Build the API URL
 $apiUrl = "https://annekelley.site/api.php";
 if ($resource !== '') {
     $apiUrl .= "/" . urlencode($resource);
 }
 if ($cols !== '') {
-    $apiUrl .= "/" . urlencode($cols);
+    // split on commas
+    $colArray = explode(',', $cols);
+
+    // build "&col1&col2" string
+    $colQuery = implode('&', array_map('urlencode', $colArray));
+
+    $apiUrl .= "/" . $colQuery;
 }
 
 // Initialize cURL
